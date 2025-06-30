@@ -2,9 +2,15 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
+import Nav from "../component/Nav";
 
 function Layout() {
-  return <Outlet />;
+  return (
+    <>
+      <Nav />
+      <Outlet />
+    </>
+  );
 }
 
 const router = createBrowserRouter([
@@ -23,22 +29,22 @@ const router = createBrowserRouter([
       },
       {
         path: "ٍِsave-papers",
-        element: <>Save</>,
+        element: <h1>Save</h1>,
       },
       {
         path: "profile",
-        element: <>Profile</>,
+        element: <h1>Profile</h1>,
       },
       {
         path: "poster",
         element: (
-          <>Poster Creation</>
+          <h1>Poster Creation</h1>
         ),
       },
       {
         path: "citation",
         element: (
-          <>Citation Evaluation</>
+          <h1>Citation Evaluation</h1>
         ),
       },
     ],

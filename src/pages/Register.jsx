@@ -10,7 +10,7 @@ function Register() {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
-    try {
+    
       if (!name.trim() || !email.trim() || !password.trim()) {
         Swal.fire({
           icon: "error",
@@ -19,8 +19,35 @@ function Register() {
         });
         return;
       }
+      if (name.length < 3) {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: "Name must be at least 3 characters long",
+        });
+        return;
+      }
+      if (password.length < 6) {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: "Password must be at least 6 characters long",
+        });
+        return;
+      }
+      if (!/\S+@\S+\.\S+/.test(email)) { // >>>> strong validation for email format
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: "Please enter a valid email address",
+        });
+        return;
+      }
+    
       const response = await register(name, email, password);
-      if (response.success) {
+      console.log("Registration response:", response);
+      
+      if (response) {
         Swal.fire({
           icon: "success",
           title: "Account Created",
@@ -32,16 +59,10 @@ function Register() {
         Swal.fire({
           icon: "error",
           title: "Registration Failed",
-          text:"Registration failed. Please try again.",
+          text:"Registration failed, Please try again",
         });
       }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: "Email or Password is incorrect",
-      });
-    }
+    
   };
 
   return (
@@ -86,7 +107,7 @@ function Register() {
         </button>
         <div className="text-center mt-2">
           <span className="text-sm text-gray-600">Already have an account? </span>
-          <Link to="/login" className="text-sm text-blue-700 hover:underline">Log In</Link>
+          <Link to="/login" className="text-sm text-blue-800 hover:underline">Log In</Link>
         </div>
       </div>
     </div>

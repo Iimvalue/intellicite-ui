@@ -1,30 +1,50 @@
 import axios from "axios";
+// import Cookies from "js-cookie";
 
 
 
 // const API_URL = process.env.API_URL;
-// "http://localhost:5000/api/users";
-const API_URL =  "https://6861109e8e74864x08444cd19.mockapi.io/UI-Auth";
+
+const API_URL = "http://localhost:3000"; 
+
 
 export const register = async (name, email, password) => {
-  const response = await axios.post(`${API_URL}/register`, { name, email, password });
-  if (response.data?.data?.token) {
-    localStorage.setItem("token", response.data.data.token);
+  const response = await axios.post(`${API_URL}/api/users/register`,
+ { name, email, password })
+  .then(function (response) {
+    console.log(response);
+    if ( response.data.data.token) {
+    localStorage.setItem("token",  response.data.data.token);
   }
   return response.data;
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  
 };
 
 export const login = async (email, password) => {
-  const response = await axios.post(`${API_URL}/login`, { email, password });
-  if (response.data?.data?.token) {
+  const response = await axios.post(`${API_URL}/api/users/login`,
+     { email, password })
+    .then(function (response) {
+  if ( response.data.data.token) {
     localStorage.setItem("token", response.data.data.token);
   }
-  return response.data;
+  return response;
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  
 };
 
+
+
 export const logout = () => {
+//   Cookies.remove("token");
   localStorage.removeItem("token");
 };
 
-export const getToken = () => localStorage.getItem("token");
+// export const getToken = () => Cookies.get("token");
 
