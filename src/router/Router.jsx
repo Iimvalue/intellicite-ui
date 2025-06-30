@@ -1,7 +1,36 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
+import Header from "../components/header/Header";
+import Home from "../pages/Home";
+import Footer from "../components/footer/Footer";
+import History from "../pages/History";
+import Save from "../pages/Save";
 
+const navigationList = [
+  { label: "Home", path: "/" },
+  { label: "History", path: "/history" },
+  { label: "Save Papers", path: "/save-papers" },
+  { label: "Citation Evaluation", path: "/citation" },
+];
+
+
+const footerNavigation = [
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+  { label: 'Terms of Service', path: '/terms' },
+  { label: 'Privacy Policy', path: '/privacy' }
+];
 function Layout() {
-  return <Outlet />;
+  return (
+    <>
+      <Header logo={"/logo.png"} navigationItems={navigationList} />
+      <Outlet />
+      {/* Footer */}
+      <Footer
+        navigationItems={footerNavigation}
+        copyrightText="© 2025 IntelliCite. All rights reserved."
+      />
+    </>
+  );
 }
 
 const router = createBrowserRouter([
@@ -9,18 +38,17 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <h1>Home page</h1> },
+      { path: "/", element: <Home /> },
       { path: "login", element: <h1>Login</h1> },
       { path: "register", element: <h1>Register</h1> },
 
-
       {
         path: "history",
-        element: <h1 >History</h1>,
+        element: <History />
       },
       {
-        path: "ٍِsave-papers",
-        element: <>Save</>,
+        path: "save-papers",
+        element: <Save />,
       },
       {
         path: "profile",
@@ -28,15 +56,11 @@ const router = createBrowserRouter([
       },
       {
         path: "poster",
-        element: (
-          <>Poster Creation</>
-        ),
+        element: <>Poster Creation</>,
       },
       {
         path: "citation",
-        element: (
-          <>Citation Evaluation</>
-        ),
+        element: <>Citation Evaluation</>,
       },
     ],
   },
