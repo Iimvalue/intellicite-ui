@@ -1,5 +1,5 @@
 import FilterDropdown from "../components/filter-dropdown/FilterDropdown";
-import HomeCard from "../components/home-card/HomeCard";
+import HomeCard from "../components/home/home-card/HomeCard";
 import { useState } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 
