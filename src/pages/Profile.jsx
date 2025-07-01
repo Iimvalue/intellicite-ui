@@ -9,12 +9,13 @@ import { Navigate } from "react-router-dom";
 export default function Profile() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-
+  const [editedName, setEditedName] = useState("");
+  const [editedEmail, setEditedEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const ChangeProfile = async () => {
       try {
         if (!isAuthenticated()) {
           throw new Error("User is not authenticated");
@@ -22,6 +23,8 @@ export default function Profile() {
         const userProfile = await getProfile();
         setName(userProfile.user.name);
         setEmail(userProfile.user.email);
+        setEditedName(userProfile.user.name);
+        setEditedEmail(userProfile.user.email);
         console.log(userProfile);
         // setProfileImage(userProfile.profileImage);
       } catch (error) {
@@ -31,7 +34,7 @@ export default function Profile() {
       }
     };
     console.log(isAuthenticated());
-    fetchProfile();
+    ChangeProfile();
   }, []);
 
   if (loading) {
@@ -41,15 +44,18 @@ export default function Profile() {
       </div>
     );
   }
-  const handleUpdateProfile = async () => {
-    try {
-      await updateProfile(name, email, profileImage);
-      alert("Profile updated successfully!");
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-      alert("Failed to update profile. Please try again.");
-    }
-  };
+ const handleUpdateProfile = async () => {
+  try {
+    await updateProfile(editedName, editedEmail, profileImage);
+    setName(editedName);
+    setEmail(editedEmail);
+    // setProfileImage(profileImage); 
+    alert("Profile updated successfully!");
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    alert("Failed to update profile. Please try again.");
+  }
+};
 
   return (
     <>
@@ -58,23 +64,31 @@ export default function Profile() {
           <div className="max-w-4xl mx-auto space-y-10">
             <div className="bg-white rounded-xl shadow p-6 sm:flex flex-col text-center sm:flex-row justify-center  sm:justify-start items-center gap-6">
               <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-3xl text-white">
-                <img className="w-full h-full object-cover rounded-full" src={null} alt="" />
+                <img
+                  className="w-full h-full object-cover rounded-full"
+                  src={null}
+                  alt=""
+                />
               </div>
               <div>
                 <div className="flex items-center">
-                  <label htmlFor="name" className="text-gray-700 text-lg font-semibold mr-2">
+                  <label
+                    htmlFor="name"
+                    className="text-gray-700 text-lg font-semibold mr-2"
+                  >
                     Name:
                   </label>
                   <p className="text-lg text-blue-800">{name}</p>
                 </div>
 
                 <div className="flex items-center">
-                  <label htmlFor="email" className="text-gray-700 text-lg font-semibold mr-2">
+                  <label
+                    htmlFor="email"
+                    className="text-gray-700 text-lg font-semibold mr-2"
+                  >
                     Email:
                   </label>
-                  <p className="text-lg text-blue-800">
-                    {email}
-                  </p>
+                  <p className="text-lg text-blue-800">{email}</p>
                 </div>
               </div>
             </div>
@@ -93,8 +107,8 @@ export default function Profile() {
                     type="text"
                     placeholder="Enter Your Full Name"
                     className="w-full border border-gray-300 rounded px-4 py-2"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
                   />
                 </div>
                 <div>
@@ -105,8 +119,8 @@ export default function Profile() {
                     type="email"
                     placeholder="Enter Your Email Address"
                     className="w-full border border-gray-300 rounded px-4 py-2"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={editedEmail}
+                    onChange={(e) => setEditedEmail(e.target.value)}
                   />
                 </div>
                 {/* <div>

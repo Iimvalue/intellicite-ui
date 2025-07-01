@@ -2,13 +2,12 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
-import Nav from "../component/Nav";
 import Profile from "../pages/Profile";
+import Citation from "../pages/Citation";
 
 function Layout() {
   return (
     <>
-      <Nav />
       <Outlet />
     </>
   );
@@ -45,7 +44,7 @@ const router = createBrowserRouter([
       {
         path: "citation",
         element: (
-          <h1>Citation Evaluation</h1>
+        <Citation/>
         ),
       },
     ],

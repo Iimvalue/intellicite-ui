@@ -67,13 +67,7 @@ Swal.fire({
             type="email"
             placeholder="your@email.com"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                email: validateEmail(e.target.value),
-              }));
-            }}
+             onChange={(e) => setEmail(e.target.value)}
             className={`w-full p-3 border ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
@@ -90,13 +84,7 @@ Swal.fire({
             type="password"
             placeholder="Enter your password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                password: validatePassword(e.target.value),
-              }));
-            }}
+            onChange={(e) => setPassword(e.target.value)}
             className={`w-full p-3 border ${
               errors.password ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}

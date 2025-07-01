@@ -50,7 +50,7 @@ function Register() {
     try {
       const response = await register(name, email, password);
 
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       const message = error.response.data.message || error.message;
 
@@ -74,13 +74,7 @@ function Register() {
           <input
             type="text"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                name: validateName(e.target.value),
-              }));
-            }}
+            onChange={(e) => setName(e.target.value)}
             className={`w-full p-3 border ${
               errors.name ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
@@ -97,13 +91,7 @@ function Register() {
           <input
             type="email"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                email: validateEmail(e.target.value),
-              }));
-            }}
+            onChange={(e) => setEmail(e.target.value)}
             className={`w-full p-3 border ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
@@ -121,13 +109,7 @@ function Register() {
           <input
             type="password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setErrors((prev) => ({
-                ...prev,
-                password: validatePassword(e.target.value),
-              }));
-            }}
+            onChange={(e) => setPassword(e.target.value)}
             className={`w-full p-3 border ${
               errors.password ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
@@ -152,7 +134,7 @@ function Register() {
         </button>
         <div className="text-center mt-4">
         <span className="text-sm text-gray-500">
-            Already have an account?{" "}
+            Already have an account?
           </span>
           <Link to="/login" className="text-blue-700 hover:underline text-sm">
             Log In
