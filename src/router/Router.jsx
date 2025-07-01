@@ -4,6 +4,10 @@ import Footer from "../components/footer/Footer";
 import History from "../pages/History";
 import Save from "../pages/Save";
 import Home from "../pages/Home";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import Profile from "../pages/Profile";
+import Citation from "../pages/Citation";
 
 const navigationList = [
   { label: "Home", path: "/" },
@@ -38,9 +42,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Home /> },
-      { path: "login", element: <h1>Login</h1> },
-      { path: "register", element: <h1>Register</h1> },
+      { path: "/", element: <Home/> },
+      { path: "login", element: <Login/>  },
+      { path: "register", element: <Register/> },
 
       {
         path: "history",
@@ -52,15 +56,19 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <>Profile</>,
+        element: <Profile /> ,
       },
       {
         path: "poster",
-        element: <>Poster Creation</>,
+        element: (
+          <h1>Poster Creation</h1>
+        ),
       },
       {
         path: "citation",
-        element: <>Citation Evaluation</>,
+        element: (
+        <Citation/>
+        ),
       },
     ],
   },
