@@ -3,6 +3,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
 import Nav from "../component/Nav";
+import Profile from "../pages/Profile";
 
 function Layout() {
   return (
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <h1>Profile</h1>,
+        element: <Profile /> ,
       },
       {
         path: "poster",
