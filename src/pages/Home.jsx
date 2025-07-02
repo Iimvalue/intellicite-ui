@@ -1,10 +1,10 @@
 import FilterDropdown from "../components/filter-dropdown/FilterDropdown";
-import HomeCard from "../components/home/home-card/HomeCard";
-import HomeCardSkeleton from "../components/home/home-sekelton/HomeSkeletonCard";
 import PdfModal from "../components/modal/Modal";
 import { useState } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
-import Footer from "../components/footer/Footer";
+import PaperCard from "../components/cards/paper/PaperCard";
+import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
+
 
 export default function Home() {
 const [searchQuery, setSearchQuery] = useState("");
@@ -48,7 +48,7 @@ const searchPapers = async (query) => {
   setError(null);
   
   try {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjExOGZkYzNkYzM3ZjQyMTExM2EyMCIsImlhdCI6MTc1MTM3NjYzOCwiZXhwIjoxNzUxNDYzMDM4fQ.ES4uNmoXTKcjEtmNFlk9prFU7sYfaCP4JUolim60d8k";
+    const token = localStorage.getItem("token");
     
     const response = await fetch(`http://localhost:3000/api/papers/search?q=${encodeURIComponent(query)}`, {
       method: 'GET',
@@ -57,6 +57,9 @@ const searchPapers = async (query) => {
         'Content-Type': 'application/json'
       }
     });
+
+    // const token = getValidToken()
+    // const response = axiosInstance.get(`/api/papers/search?q=${encodeURIComponent(query)}`)
     
     const data = await response.json();
     
@@ -264,7 +267,7 @@ return (
             {loading && (
               <div className="space-y-4 sm:space-y-6">
                 {[1, 2, 3].map((index) => (
-                  <HomeCardSkeleton key={index} className="w-full" />
+                  <PaperSkeletonCard key={index} className="w-full" />
                 ))}
               </div>
             )}
@@ -281,7 +284,7 @@ return (
                     : paper.sourceLink;
                   
                   return (
-                    <HomeCard
+                    <PaperCard
                       key={paper._id}
                       badges={paper.badges || []}
                       title={paper.title}
@@ -372,11 +375,6 @@ return (
       title={pdfModal.title}
     />
 
-    {/* Footer */}
-    <Footer 
-      navigationItems={footerNavigation}
-      copyrightText="© 2025 IntelliCite. All rights reserved."
-    />
   </div>
 );
 }
