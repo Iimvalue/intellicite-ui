@@ -1,6 +1,6 @@
 import React from 'react';
 
-const HomeCardSkeleton = ({ className = "" }) => {
+const PaperSkeletonCard = ({ className = "" }) => {
   return (
     <div className={`bg-white border border-gray-200 rounded-lg p-6 relative animate-pulse ${className}`}>
       {/* Bookmark Icon Skeleton - Top Right */}
@@ -48,4 +48,4 @@ const HomeCardSkeleton = ({ className = "" }) => {
   );
 };
 
-export default HomeCardSkeleton;
+export default PaperSkeletonCard;

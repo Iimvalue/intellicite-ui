@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Bookmark, Calendar, FileText, Users, ExternalLink } from 'lucide-react';
 
-const HomeCard = ({
+const PaperCard = ({
   badges = [],
   title,
   description,
@@ -231,4 +231,4 @@ const HomeCard = ({
   );
 };
 
-export default HomeCard;
+export default PaperCard;
