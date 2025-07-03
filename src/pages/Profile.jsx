@@ -135,7 +135,7 @@ export default function Profile() {
                 </div> */}
                 <div className="pt-4">
                   <button
-                    className="bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-600 transition"
+                     className="w-full bg-blue-800 text-white font-bold py-3 rounded mt-2 hover:bg-blue-700 transition-colors text-lg cursor-pointer"
                     onClick={handleUpdateProfile}
                   >
                     Change

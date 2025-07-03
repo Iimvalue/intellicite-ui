@@ -23,7 +23,7 @@ const Header = ({
 
   return (
     <header className="w-full bg-white border-b" style={{borderColor: '#E5E8EB'}}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <div className="p-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex-shrink-0">
