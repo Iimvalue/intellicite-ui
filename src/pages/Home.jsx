@@ -48,7 +48,7 @@ const searchPapers = async (query) => {
   setError(null);
   
   try {
-    const token = localStorage.getItem("token");
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODYxMThmZGMzZGMzN2Y0MjExMTNhMjAiLCJpYXQiOjE3NTE1NDAwNTgsImV4cCI6MTc1MTYyNjQ1OH0.8PWsVJfnMsFVyRYhblJWHSO-GUBpgGHXtcMCpmMYnLE"
     
     const response = await fetch(`http://localhost:3000/api/papers/search?q=${encodeURIComponent(query)}`, {
       method: 'GET',
