@@ -4,7 +4,7 @@ import { useState } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PaperCard from "../components/cards/paper/PaperCard";
 import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
-
+import axiosInstance from "../services/axiosInstance"; 
 
 export default function Home() {
 const [searchQuery, setSearchQuery] = useState("");
@@ -43,29 +43,19 @@ const footerNavigation = [
 // Function to search papers from API
 const searchPapers = async (query) => {
   if (!query.trim()) return;
-  
+
   setLoading(true);
   setError(null);
-  
-  try {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODYxMThmZGMzZGMzN2Y0MjExMTNhMjAiLCJpYXQiOjE3NTE1NDAwNTgsImV4cCI6MTc1MTYyNjQ1OH0.8PWsVJfnMsFVyRYhblJWHSO-GUBpgGHXtcMCpmMYnLE"
-    
-    const response = await fetch(`http://localhost:3000/api/papers/search?q=${encodeURIComponent(query)}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
 
-    // const token = getValidToken()
-    // const response = axiosInstance.get(`/api/papers/search?q=${encodeURIComponent(query)}`)
-    
-    const data = await response.json();
-    
+  try {
+    // استخدم axiosInstance مع بناء رابط الطلب
+    const response = await axiosInstance.get(`/api/papers/search?q=${encodeURIComponent(query)}`);
+
+    const data = response.data;
+
     if (data.success) {
       setAllPapers(data.data); // Store original results
-      setPapers(data.data); // Display results
+      setPapers(data.data);    // Display results
     } else {
       setError("Failed to fetch papers");
     }
