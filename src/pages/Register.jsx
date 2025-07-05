@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { register } from "../services/authService";
+import { Link, useNavigate } from "react-router";
+import { register } from "./../services/authService";
 
 function Register() {
   const [name, setName] = useState("");

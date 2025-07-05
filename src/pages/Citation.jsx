@@ -1,77 +1,178 @@
-import React from "react";
-// import { useEffect } from "react";
-// import { isAuthenticated } from "../services/authService";
-// import { Navigate } from "react-routee";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import PdfModal from "../components/modal/Modal";
+import PaperCitation from "../components/cards/paper/PaperCitation";
+import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
 
 function Citation() {
+  const [doi, setDoi] = useState("");
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [paper, setPaper] = useState(null);
+  const [error, setError] = useState(null);
+  const [pdfModal, setPdfModal] = useState({
+    isOpen: false,
+    pdfUrl: "",
+    title: "",
+  });
 
-  // const navigate = useNavigate();
+  const handleCheck = async () => {
+    if (!doi.trim() || !query.trim()) return;
+    setLoading(true);
+    setError(null);
+    setPaper(null);
 
+    try {
+      const token = localStorage.getItem("token");
 
-  // useEffect(() => {
-  //   if (!isAuthenticated()) {
-  //     navigate("/login");
-  //   }
-  // }, []);
+      const response = await fetch(
+        `http://localhost:3000/api/papers/citeCheck`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ doi, query }),
+        }
+      );
 
+      const data = await response.json();
+      if (data.success) {
+        setPaper({
+          ...data.data.paperId,
+          reportText: data.data.report,
+        });
+      } else {
+        setError("Citation check failed");
+      }
+    } catch (err) {
+      console.error("Evaluation error:", err);
+      setError("Server error during evaluation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewPdf = (pdfUrl, title) => {
+    setPdfModal({ isOpen: true, pdfUrl, title });
+  };
+
+  const handleViewPaper = (paperId, link) => {
+    if (link?.trim()) {
+      window.open(link, "_blank");
+    } else {
+      const fallback = `https://doi.org/${paperId}`;
+      window.open(fallback, "_blank");
+    }
+  };
+
+  const handleClosePdfModal = () => {
+    setPdfModal({ isOpen: false, pdfUrl: "", title: "" });
+  };
+
+  const getDescription = (reportText, paper) => {
+    if (reportText?.trim()) return reportText;
+    const year = new Date(paper.publicationDate).getFullYear();
+    return `Published in ${paper.journal} (${year})`;
+  };
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Seam-style border/shadow at the top */}
-      <div className="w-full border-b border-gray-200 shadow-[0_2px_8px_0_rgba(0,0,0,0.03)] mb-8"></div>
-
-      <div className="px-8 py-4 flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
-        {/* Left Side */}
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Citation Evaluation</h1>
-          <p className="text-gray-600 mb-6">
-            Assess the credibility and relevance of your citations with our evaluation tool. Simply paste your citation below to receive a detailed analysis.
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+        {/* Title & Intro */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Citation Evaluation
+          </h1>
+          <p className="text-sm text-gray-600">
+            Check the credibility and relevance of academic papers using their
+            DOI and your research topic.
           </p>
-          <textarea
-            placeholder="Enter Your Citation Here..."
-            className="w-full border rounded-md p-4 h-32 text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
-            Evaluate
-          </button>
         </div>
 
-        {/* Right Side */}
-        <div className="flex-1 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              The Impact of Social Media on Adolescent Mental Health
-            </h2>
-            <p className="text-gray-600 text-sm mt-2">
-              This study examines the correlation between social media usage and mental health outcomes in adolescents, finding a significant link between heavy social media use and increased rates of anxiety and depression.
-            </p>
-            <p className="text-gray-500 text-sm mt-1">Published in the Journal of Adolescent Psychology, 2022</p>
-            <a href="#" className="text-blue-600 text-sm mt-2 inline-block hover:underline">
-              View Paper
-            </a>
-          </div>
+        {/* Input Section */}
+        <div className="flex flex-col lg:flex-row gap-5">
+          {/* Left Inputs */}
+          <div className="w-full lg:w-1/3 space-y-6">
+            {/* Query input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Enter Your Research Topic
+              </label>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Research Topic"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">Outdated</span>
-            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">Highly Recommended</span>
-            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-medium">Weakly Cited</span>
-          </div>
+            {/* DOI input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Enter Citation DOI
+              </label>
+              <input
+                type="text"
+                value={doi}
+                onChange={(e) => setDoi(e.target.value)}
+                placeholder="e.g 10.1000/xyz123"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-          {/* Download */}
-          <div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition">
-              Download Report
-            </button>
-          </div>
+            {/* Button */}
+            <Button
+              onClick={handleCheck}
+              disabled={loading || !doi.trim() || !query.trim()}
+              className="w-full Rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Evaluating..." : "Evaluate Citation"}
+            </Button>
 
-          {/* Citation Count Box */}
-          <div className="bg-gray-100 rounded-lg p-4">
-            <p className="text-gray-500 text-sm">Citation Count</p>
-            <p className="text-2xl font-bold text-gray-800">125</p>
+            {/* Error Message */}
+            {error && <p className="text-red-600 text-sm pt-2">{error}</p>}
+          </div>
+          {/* Right - Result */}
+          <div className="flex-1">
+            {loading && <PaperSkeletonCard className="w-full" />}
+
+            {!loading && paper && (
+              <PaperCitation
+                title={paper.title}
+                description={getDescription(paper.reportText, paper)}
+                badges={paper.badges || []}
+                authors={paper.authors}
+                journal={paper.journal}
+                publicationDate={paper.publicationDate}
+                citationCount={paper.citationCount}
+                viewPaperLink={paper.pdfLink || paper.sourceLink}
+                initialSaved={false}
+                onSavePaper={() => {}}
+                onViewPaper={() => handleViewPaper(paper._id, paper.sourceLink)}
+                onViewPdf={handleViewPdf}
+                className="w-full"
+              />
+            )}
+
+            {!loading && !paper && !error && (
+              <div className="text-gray-400 text-center mt-8 text-sm">
+                Enter a topic and DOI to evaluate a paper.
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* PDF Modal */}
+      <PdfModal
+        isOpen={pdfModal.isOpen}
+        onClose={handleClosePdfModal}
+        pdfUrl={pdfModal.pdfUrl}
+        title={pdfModal.title}
+      />
     </div>
   );
 }
