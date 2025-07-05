@@ -86,10 +86,9 @@ export const updateProfile = async (name, email, profileImage) => {
 export const logout = () => {
   localStorage.removeItem("token");
 };
+
 export const isAuthenticated = () => {
   const isAuth = localStorage.getItem("token");
-    return isAuth;
+  return !!isAuth;
 };
-
-
 
