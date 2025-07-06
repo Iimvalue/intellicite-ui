@@ -78,7 +78,9 @@ function Citation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
+      {" "}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Title & Intro */}
         <div>
@@ -165,7 +167,6 @@ function Citation() {
           </div>
         </div>
       </div>
-
       {/* PDF Modal */}
       <PdfModal
         isOpen={pdfModal.isOpen}

@@ -23,7 +23,7 @@ const Header = ({ logo, navigationItems = [] }) => {
 
   return (
     <header
-      className="w-full bg-white border-b"
+      className="w-full  bg-white border-b fixed  top-0 left-0 z-50"
       style={{ borderColor: "#E5E8EB" }}
     >
       <div className=" sm:px-6 py-4">
@@ -76,7 +76,8 @@ const Header = ({ logo, navigationItems = [] }) => {
                       location.pathname === item.path ? "#1e3b8a" : "#6b7280",
                     backgroundColor:
                       location.pathname === item.path
-                        ? "rgba(60, 131, 246, 0.15)"
+                        // ? "rgba(60, 150, 246, 0.15)"
+                        ? "#c2dcff"
                         : "transparent",
                   }}
                   onMouseEnter={(e) => {
