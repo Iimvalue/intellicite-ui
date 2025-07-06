@@ -8,6 +8,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Citation from "../pages/Citation";
+import LandingPage from "../pages/LandingPage";
 
 const navigationList = [
   { label: "Home", path: "/" },
@@ -69,6 +70,13 @@ const router = createBrowserRouter([
         element: (
         <Citation/>
         ),
+      },
+      {
+        path: "landing",
+        element: (
+          <LandingPage/>
+        ),
+
       },
     ],
   },

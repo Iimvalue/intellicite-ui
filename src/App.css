@@ -1,5 +1,94 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@keyframes typingPause {
+  0% {
+    width: 0%;
+    visibility: hidden;
+  }
+  80% {
+    width: 100%;
+    visibility: visible;
+  }
+  100% {
+    width: 100%;
+    visibility: visible;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: white;
+  }
+}
+.animate-typing {
+  animation:
+    typingPause 8s steps(60, end) infinite,
+    blink 0.8s step-end infinite;
+
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+
+  font-weight: bold;
+  border-right: 4px solid white;
+
+}
+
+/* 0 T0 600px  */
+@media (max-width: 600px) {
+  .animate-typing {
+    font-size: 2rem;
+    animation: none;
+    border-right: none;
+    overflow: visible;
+    white-space: normal;
+  }
+}
+
+/* 601 T0 699px */
+@media (min-width: 601px) and (max-width: 699px) {
+  .animate-typing {
+    font-size: 1.8rem; 
+  }
+}
+
+/* 700 T0 800px */
+@media (min-width: 700px) and (max-width: 800px) {
+  .animate-typing {
+    font-size: 2rem; 
+  }
+}
+
+/* 801 T0 900px */
+@media (min-width: 801px) and (max-width: 900px) {
+  .animate-typing {
+    font-size: 2.5rem; 
+  }
+}
+
+/* 901 T0 1000px */
+@media (min-width: 901px) and (max-width: 1000px) {
+  .animate-typing {
+    font-size: 2.8rem; 
+    
+  }
+}
+
+/* 1001 T0 ABOVE  */
+@media (min-width: 1001px) {
+  .animate-typing {
+    font-size: 3.2rem; 
+    
+  }
+}
+
 /* * {
   background-color: #e5e7eb;
 } */
