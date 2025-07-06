@@ -116,7 +116,7 @@ const PaperCard = ({
           className={`p-2.5 rounded-full transition-all duration-200 ${
             isSaved 
               ? 'text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 shadow-sm' 
-              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50 opacity-70 group-hover:opacity-100'
+              : 'text-gray-800 hover:text-gray-600 hover:bg-gray-50 opacity-70 group-hover:opacity-100'
           } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           title={isSaved ? 'Remove from saved' : 'Save paper'}
         >
