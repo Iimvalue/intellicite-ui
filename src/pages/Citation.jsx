@@ -79,7 +79,7 @@ function Citation() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Title & Intro */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -136,7 +136,7 @@ function Citation() {
             {error && <p className="text-red-600 text-sm pt-2">{error}</p>}
           </div>
           {/* Right - Result */}
-          <div className="flex-1">
+          <div className="flex-3/3 ">
             {loading && <PaperSkeletonCard className="w-full" />}
 
             {!loading && paper && (
