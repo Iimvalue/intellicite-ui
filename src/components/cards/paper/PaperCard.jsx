@@ -222,7 +222,7 @@ const PaperCard = ({
           ) : (
             <>
               <ExternalLink className="h-4 w-4 mr-2" />
-              Go to Paper
+              Go to Source
             </>
           )}
         </Button>
