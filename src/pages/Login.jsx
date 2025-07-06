@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import Swal from "sweetalert2";
-import { login } from "../services/authService";
+import { login } from "./../services/authService";
 
 function Login() {
   const [email, setEmail] = useState("");

@@ -16,12 +16,11 @@ const navigationList = [
   { label: "Citation Evaluation", path: "/citation" },
 ];
 
-
 const footerNavigation = [
-  { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' },
-  { label: 'Terms of Service', path: '/terms' },
-  { label: 'Privacy Policy', path: '/privacy' }
+  { label: "About", path: "/about" },
+  { label: "Contact", path: "/contact" },
+  { label: "Terms of Service", path: "/terms" },
+  { label: "Privacy Policy", path: "/privacy" },
 ];
 function Layout() {
   return (
@@ -42,13 +41,13 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Home/> },
-      { path: "login", element: <Login/>  },
-      { path: "register", element: <Register/> },
+      { path: "/", element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
 
       {
         path: "history",
-        element: <History />
+        element: <History />,
       },
       {
         path: "save-papers",
@@ -56,19 +55,15 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <Profile /> ,
+        element: <Profile />,
       },
       {
         path: "poster",
-        element: (
-          <h1>Poster Creation</h1>
-        ),
+        element: <h1>Poster Creation</h1>,
       },
       {
         path: "citation",
-        element: (
-        <Citation/>
-        ),
+        element: <Citation />,
       },
     ],
   },
