@@ -34,29 +34,29 @@ const Header = ({ logo, navigationItems = [] }) => {
       className="w-full  bg-white border-b fixed top-0 left-0 z-50"
       style={{ borderColor: "#E5E8EB" }}
     >
-      <div className="sm:px-6">
+      <div className="sm:px-7">
         <div className="flex justify-end items-center py-1 border-b border-gray-200">
           <div className="flex items-center space-x-2 text-sm">
-            <span className="text-gray-700 font-medium">حجم الخط:</span>
+            <span className="text-gray-700 font-medium">Font Size:</span>
             <button
               onClick={increaseFont}
-              className="px-2 text-blue-700 hover:text-blue-900 font-bold"
-              title="تكبير الخط"
+              className="text-[18px] px-2 text-blue-700 hover:text-blue-900 font-bold"
+              title="Increase Font"
             >
               A+
             </button>
             <button
               onClick={decreaseFont}
-              className="px-2 text-blue-700  hover:text-blue-900 font-bold"
-              title="تصغير الخط"
+              className="px-1  text-blue-700 hover:text-blue-900 font-bold"
+              title="Decrease Font"
             >
               A−
             </button>
           </div>
         </div>
 
-        {/* ✅ Navbar الرئيسي */}
-        <div className="py-2">
+
+        <div className="lg:py-1">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex-shrink-0">
