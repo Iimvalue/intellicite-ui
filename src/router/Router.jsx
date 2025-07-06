@@ -9,6 +9,12 @@ import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Citation from "../pages/Citation";
 
+import {
+  Dashboard,
+  UserManagement,
+  Settings
+} from "../admin";
+
 const navigationList = [
   { label: "Home", path: "/" },
   { label: "History", path: "/history" },
@@ -70,6 +76,15 @@ const router = createBrowserRouter([
         <Citation/>
         ),
       },
+    ],
+  },
+  {
+    path: "/admin",
+    children: [
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "users", element: <UserManagement /> },
+      { path: "settings", element: <Settings /> },
+      { path: "", element: <Dashboard /> },
     ],
   },
 ]);
