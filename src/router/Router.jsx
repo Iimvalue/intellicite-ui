@@ -11,7 +11,8 @@ import Citation from "../pages/Citation";
 import LandingPage from "../pages/LandingPage";
 
 const navigationList = [
-  { label: "Home", path: "/" },
+  { label: 'Home', path: '/landing' },
+  { label: "Search", path: "/search" },
   { label: "History", path: "/history" },
   { label: "Save Papers", path: "/save-papers" },
   { label: "Citation Evaluation", path: "/citation" },
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Home/> },
+      { path: "search", element: <Home/> },
       { path: "login", element: <Login/>  },
       { path: "register", element: <Register/> },
 

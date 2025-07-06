@@ -4,7 +4,7 @@ import {
   updateProfile,
   isAuthenticated,
 } from "../services/authService";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 
 export default function Profile() {
   const [name, setName] = useState("");
