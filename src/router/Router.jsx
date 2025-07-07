@@ -12,7 +12,8 @@ import Citation from "../pages/Citation";
 import {
   Dashboard,
   UserManagement,
-  Settings
+  Settings,
+  AdminProtectedRoute
 } from "../admin";
 
 const navigationList = [
@@ -81,10 +82,38 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     children: [
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "users", element: <UserManagement /> },
-      { path: "settings", element: <Settings /> },
-      { path: "", element: <Dashboard /> },
+      { 
+        path: "dashboard", 
+        element: (
+          <AdminProtectedRoute>
+            <Dashboard />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "users", 
+        element: (
+          <AdminProtectedRoute>
+            <UserManagement />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "settings", 
+        element: (
+          <AdminProtectedRoute>
+            <Settings />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "", 
+        element: (
+          <AdminProtectedRoute>
+            <Dashboard />
+          </AdminProtectedRoute>
+        ) 
+      },
     ],
   },
 ]);

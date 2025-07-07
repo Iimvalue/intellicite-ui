@@ -1,28 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../../components/ui/button';
-import { LogOut, Settings, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { Button } from '../../components/ui/button';
+import { LogOut, User } from 'lucide-react';
 import { logout, getProfile, isAuthenticated } from '../../services/authService';
+import { isAdmin } from '../../services/adminService';
 
 const AdminHeader = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState('Admin');
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        if (isAuthenticated()) {
-          const userProfile = await getProfile();
-          setUserName(userProfile.user.name);
+        if (!isAuthenticated()) {
+          navigate('/login');
+          return;
+        }
+
+        const userProfile = await getProfile();
+
+        
+        const user = userProfile.user || userProfile.data?.user;
+        const name = user?.name || 'Admin';
+        const role = user?.role || 'user';
+        
+        setUserName(name);
+        setUserRole(role);
+        
+        if (!isAdmin(userProfile.user)) {
+          navigate('/');
         }
       } catch (error) {
         console.error('Failed to fetch user profile:', error);
         setUserName('Admin'); 
+        navigate('/login');
       }
     };
 
     fetchUserProfile();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     logout();
@@ -50,27 +67,24 @@ const AdminHeader = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <User className="w-4 h-4" />
-              <span>Welcome, {userName}</span>
+            <div className="flex items-center space-x-2 text-sm">
+              <User className="w-4 h-4 text-gray-500" />
+              <span className="text-gray-700">Welcome {userName}</span>
+              {userRole && (
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                  {userRole}
+                </span>
+              )}
             </div>
             
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={handleLogout}
-              className="text-gray-600 hover:text-gray-900"
+              className="text-gray-600 hover:text-red-600 hover:bg-red-50"
             >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Logout</span>
+              <LogOut className="w-4 h-4 mr-1" />
+              Logout
             </Button>
           </div>
         </div>
