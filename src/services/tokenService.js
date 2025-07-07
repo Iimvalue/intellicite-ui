@@ -13,7 +13,7 @@ export function getValidToken() {
 
 export function isTokenExpired(token) {
   try {
-    const decoded = jwtDecode(token);
+    const decoded = jwtDecode(token); // updated
     if (!decoded.exp) return true;
 
     const now = Date.now() / 1000;

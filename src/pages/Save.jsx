@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PaperCard from "../components/cards/paper/PaperCard";
 import PdfModal from "../components/modal/Modal";
+import axiosInstance from "../services/axiosInstance";
 
 export default function Save() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,30 +55,16 @@ export default function Save() {
     try {
       setLoading(true);
       setError(null);
-      
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
 
-      const response = await fetch('http://localhost:3000/api/saved-papers/', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axiosInstance.get('api/saved-papers/');
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("API Response:", data);
-        
-        if (data.success) {
-          const transformedData = transformSavedData(data);
-          setAllPapers(transformedData);
-          setPapers(transformedData);
-        } else {
-          setError(data.message || "Failed to fetch saved papers");
-        }
+      if (response.data.success) {
+        console.log("API Response:", response.data);
+        const transformedData = transformSavedData(response.data);
+        setAllPapers(transformedData);
+        setPapers(transformedData);
       } else {
-        setError(`Failed to fetch saved papers: ${response.status}`);
+        setError(response.data.message || "Failed to fetch saved papers");
       }
     } catch (error) {
       console.error("Error fetching saved papers:", error);
@@ -219,18 +206,9 @@ export default function Save() {
     console.log("Removing paper from saved:", paperId);
     
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
-      
-      // Use the paperId directly in the URL
-      const response = await fetch(`http://localhost:3000/api/saved-papers/${paperId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axiosInstance.delete(`api/saved-papers/${paperId}`);
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Remove from local state immediately for better UX
         const updatedAllPapers = allPapers.filter(p => p.paper._id !== paperId);
         const updatedPapers = papers.filter(p => p.paper._id !== paperId);
@@ -356,8 +334,8 @@ export default function Save() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
+<div className="min-h-screen bg-gray-50 pt-20">    {/* Main Content */}
+{/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Sidebar - Filter Panel */}

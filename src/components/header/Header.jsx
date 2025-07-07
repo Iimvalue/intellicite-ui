@@ -1,192 +1,252 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useLocation } from "react-router";
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
+import {
+  logout,
+  isAuthenticated,
+  getProfile,
+} from "../../services/authService";
+import { Toast } from "primereact/toast";
+import { ConfirmDialog } from "primereact/confirmdialog";
+import { confirmDialog } from "primereact/confirmdialog";
 
 const Header = ({ logo, navigationItems = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const navRef = useRef(null);
+  const toast = useRef(null);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [fontSize, setFontSize] = useState(100);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInitial, setUserInitial] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleSignIn = () => {
-    navigate("/login");
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (isAuthenticated()) {
+        setIsLoggedIn(true);
+        try {
+          const profile = await getProfile();
+          setUserInitial(profile.user.name?.charAt(0).toUpperCase() || "U");
+        } catch (error) {
+          console.error("Failed to fetch profile:", error);
+        }
+      } else {
+        setIsLoggedIn(false);
+        setUserInitial("");
+      }
+    };
+    checkAuth();
+  }, [location.pathname]);
+
+  const increaseFont = () => {
+    const newSize = Math.min(fontSize + 10, 150);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const decreaseFont = () => {
+    const newSize = Math.max(fontSize - 10, 80);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
   };
 
-  // Find active navigation item
-  const activeIndex = navigationItems.findIndex(
-    (item) => item.path === location.pathname
-  );
+  const handleSignIn = () => navigate("/login");
+
+  const handleLogout = () => {
+    confirmDialog({
+      message: "You will be logged out of your account.",
+      header: "Are you sure?",
+      icon: "pi pi-exclamation-triangle",
+      acceptClassName: "p-button-danger",
+      acceptLabel: "Yes, log me out",
+      rejectLabel: "Cancel",
+      accept: () => {
+        logout();
+        setIsLoggedIn(false);
+        toast.current.show({
+          severity: "success",
+          summary: "Logged out",
+          detail: "You have been successfully logged out.",
+          life: 3000,
+        });
+        navigate("/login");
+      },
+    });
+  };
 
   return (
-    <header
-      className="w-full bg-white border-b"
-      style={{ borderColor: "#E5E8EB" }}
-    >
-      <div className=" sm:px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            {logo ? (
-              <Link to="/" className="flex items-center">
-                {typeof logo === "string" ? (
-                  <img
-                    src={logo}
-                    alt="Logo"
-                    className="h-12 w-12 rounded-full"
-                  />
-                ) : (
-                  logo
-                )}
-              </Link>
-            ) : (
-              <Link to="/" className="flex items-center">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: "#283646" }}
-                >
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+    <>
+      <Toast ref={toast} position="top-right" />
+      <ConfirmDialog />
+
+      <header className="w-full bg-white  fixed top-0 left-0 z-50">
+        <div className="sm:px-7">
+          {/* Font Controls */}
+          <div className="flex justify-end items-center py-1  border-b border-gray-200">
+            <div className="flex items-center space-x-2 text-sm">
+              <span className="text-gray-700 font-medium">Font Size:</span>
+              <button onClick={increaseFont} className="text-[18px] px-2 text-blue-700 hover:text-blue-900 font-bold">A+</button>
+              <button onClick={decreaseFont} className="px-1 text-blue-700 hover:text-blue-900 font-bold">A−</button>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="">
+            <div className="flex items-center justify-between m-1 ">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <Link to="/landing" className="flex items-center">
+                  {logo ? (
+                    typeof logo === "string" ? (
+                      <img src={logo} alt="Logo" className="h-12 w-12  rounded-2xl" />
+                    ) : logo
+                  ) : (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-900 text-white">
+                      <span className="text-xl font-bold">I</span>
+                    </div>
+                  )}
+                </Link>
+              </div>
+
+              {/* Desktop Navigation */}
+              <nav className="hidden lg:flex items-center space-x-8">
+                {navigationItems.map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className={`text-sm font-medium py-2 px-3 rounded-lg transition-all ${
+                      location.pathname === item.path
+                        ? "text-blue-900 bg-blue-100"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
                   >
-                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Right Section */}
+              <div className="flex items-center space-x-4">
+                {isLoggedIn ? (
+                  <div className="relative hidden lg:block">
+                    <div
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      className="w-10 h-10 rounded-full bg-blue-800 text-white flex items-center justify-center cursor-pointer hover:bg-blue-900"
+                    >
+                      {userInitial || "U"}
+                    </div>
+                    {dropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 z-50">
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            navigate("/profile");
+                          }}
+                        >
+                          Profile
+                        </button>
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            handleLogout();
+                          }}
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleSignIn}
+                    className="text-sm font-medium py-2 bg-[#1341F8] hover:bg-[#1e3b8a] text-white"
+                  >
+                    Sign In
+                  </Button>
+                )}
+
+                {/* Mobile menu toggle */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="lg:hidden p-2 text-gray-600 hover:text-blue-800"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    {isMobileMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
                   </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            {isMobileMenuOpen && (
+              <div className="lg:hidden mt-2 border-t border-gray-200 pt-4 pb-4 space-y-3">
+                {navigationItems.map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block text-sm font-medium px-4 py-2 rounded ${
+                      location.pathname === item.path
+                        ? "text-blue-900 bg-blue-100"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <div className="border-t pt-4 mt-2">
+                  {isLoggedIn ? (
+                    <>
+                      <div className="flex items-center gap-3 px-4 mb-2">
+                        <div className="w-9 h-9 rounded-full bg-blue-800 text-white flex items-center justify-center text-sm font-semibold">
+                          {userInitial}
+                        </div>
+                        <div className="text-sm font-medium text-gray-800">My Account</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigate("/profile");
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100"
+                      >
+                        Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-left text-sm px-4 py-2 text-red-600 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        handleSignIn();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100 text-gray-700"
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  )}
                 </div>
-              </Link>
+              </div>
             )}
           </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8 relative">
-            <div
-              ref={navRef}
-              className="flex items-center space-x-6 xl:space-x-8"
-            >
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className="text-sm font-medium transition-all duration-200 py-2 px-3 rounded-lg relative whitespace-nowrap"
-                  style={{
-                    color:
-                      location.pathname === item.path ? "#1e3b8a" : "#6b7280",
-                    backgroundColor:
-                      location.pathname === item.path
-                        ? "rgba(60, 131, 246, 0.15)"
-                        : "transparent",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (location.pathname !== item.path) {
-                      e.target.style.color = "#1e3b8a";
-                      e.target.style.backgroundColor =
-                        "rgba(60, 131, 246, 0.08)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (location.pathname !== item.path) {
-                      e.target.style.color = "#6b7280";
-                      e.target.style.backgroundColor = "transparent";
-                    }
-                  }}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          {/* Sign In/Sign Up Button */}
-          <Button
-            onClick={handleSignIn}
-            className="text-sm font-medium transition-colors duration-200 py-2 whitespace-nowrap bg-[#1341F8] hover:bg-[#1e3b8a] cursor-pointer"
-            style={{ color: "white" }}
-           
-          >
-            Sign In
-          </Button>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="lg:hidden p-2 rounded-md transition-colors duration-200"
-            style={{ color: "#6b7280" }}
-            onMouseEnter={(e) => {
-              e.target.style.color = "#1e3b8a";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.color = "#6b7280";
-            }}
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div
-            className="lg:hidden mt-4 pb-4 border-t"
-            style={{ borderColor: "#E5E8EB" }}
-          >
-            <nav className="flex flex-col space-y-4 pt-4">
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-sm font-medium transition-all duration-200 py-2 px-3 rounded-lg"
-                  style={{
-                    color:
-                      location.pathname === item.path ? "#1e3b8a" : "#6b7280",
-                    backgroundColor:
-                      location.pathname === item.path
-                        ? "rgba(60, 131, 246, 0.15)"
-                        : "transparent",
-                  }}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              <button
-                onClick={() => {
-                  handleSignIn();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="text-sm font-medium transition-colors duration-200 py-2 px-3 text-left rounded-lg"
-                style={{ color: "#6b7280" }}
-              >
-                Sign In/Sign Up
-              </button>
-            </nav>
-          </div>
-        )}
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 

@@ -25,12 +25,21 @@ const Footer = ({
             </nav>
           )}
 
+          {/* Logo - Moved here */}
+          <img
+            src="./public/logo.png"
+            className="h-10 w-10 rounded-full"
+
+            alt="Company Logo" // Always add alt text for accessibility
+          />
+
           {/* Copyright */}
           <div className="text-center">
             <p className="text-gray-500 text-sm">
               {copyrightText}
             </p>
           </div>
+
         </div>
       </div>
     </footer>

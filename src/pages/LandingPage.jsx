@@ -4,7 +4,7 @@ import { Link } from "react-router";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-5 py-10">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-5 py-25">
       <div className="max-w-6xl w-full text-center">
         {/* Website Name */}
         <h1 className="animate-typing text-xl sm:text-3xl md:text-4xl font-extrabold text-gray-700 mb-6 max-w-full">

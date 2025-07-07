@@ -3,7 +3,7 @@ import PaperCard from "../components/cards/paper/PaperCard";
 import { useState, useEffect } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PdfModal from "../components/modal/Modal";
-
+import axiosInstance from "../services/axiosInstance";
 export default function History() {
   const [searchQuery, setSearchQuery] = useState("");
   const [papers, setPapers] = useState([]);
@@ -19,8 +19,8 @@ export default function History() {
   });
   const [pdfModal, setPdfModal] = useState({
     isOpen: false,
-    pdfUrl: '',
-    title: ''
+    pdfUrl: "",
+    title: "",
   });
 
   // Function to transform backend response to component format
@@ -30,10 +30,14 @@ export default function History() {
     }
 
     const transformedData = [];
-    
+
     apiResponse.data.forEach((historyItem) => {
       // Skip items with empty results (like the Arabic query)
-      if (historyItem.results && Array.isArray(historyItem.results) && historyItem.results.length > 0) {
+      if (
+        historyItem.results &&
+        Array.isArray(historyItem.results) &&
+        historyItem.results.length > 0
+      ) {
         historyItem.results.forEach((result, index) => {
           transformedData.push({
             id: `${historyItem._id}_${index}`, // Create unique ID combining history ID and result index
@@ -48,21 +52,24 @@ export default function History() {
               pdfLink: result.paper.pdfLink || "",
               sourceLink: result.paper.sourceLink,
               doi: result.paper.doi,
-              isOpenAccess: result.paper.isOpenAccess
+              isOpenAccess: result.paper.isOpenAccess,
             },
             reportText: result.report?.report || "",
             searchQuery: historyItem.query, // Keep track of original search query
-            searchDate: historyItem.createdAt
+            searchDate: historyItem.createdAt,
           });
         });
       }
     });
 
     // Remove duplicates based on paper._id and searchQuery combination
-    const uniqueData = transformedData.filter((item, index, self) => 
-      index === self.findIndex((t) => 
-        t.paper._id === item.paper._id && t.searchQuery === item.searchQuery
-      )
+    const uniqueData = transformedData.filter(
+      (item, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.paper._id === item.paper._id && t.searchQuery === item.searchQuery
+        )
     );
 
     return uniqueData;
@@ -73,21 +80,13 @@ export default function History() {
     try {
       setLoading(true);
       setError(null);
-      
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
 
-      const response = await fetch(`http://localhost:3000/api/user-history`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axiosInstance.get(`/api/user-history`);
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         console.log("API Response:", data);
-        
+
         if (data.success) {
           const transformedData = transformHistoryData(data);
           setAllPapers(transformedData);
@@ -109,21 +108,15 @@ export default function History() {
   // Fetch saved papers to check which ones are already saved
   const fetchSavedPaperIds = async () => {
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
+      const response = await axiosInstance.get("/api/saved-papers/");
 
-      const response = await fetch('http://localhost:3000/api/saved-papers/', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         if (data.success && data.data) {
           // Extract paper IDs from saved papers
-          const savedIds = new Set(data.data.map(savedItem => savedItem.paperId._id));
+          const savedIds = new Set(
+            data.data.map((savedItem) => savedItem.paperId._id)
+          );
           setSavedPapers(savedIds);
           console.log("Loaded saved paper IDs:", savedIds);
         }
@@ -139,10 +132,7 @@ export default function History() {
       setLoading(true);
       try {
         // Load both history and saved papers concurrently
-        await Promise.all([
-          fetchHistoryData(),
-          fetchSavedPaperIds()
-        ]);
+        await Promise.all([fetchHistoryData(), fetchSavedPaperIds()]);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -155,7 +145,10 @@ export default function History() {
   // Watch for searchQuery changes to handle clearing
   useEffect(() => {
     if (searchQuery === "" && allPapers.length > 0) {
-      console.log("Search query is empty, showing all papers:", allPapers.length);
+      console.log(
+        "Search query is empty, showing all papers:",
+        allPapers.length
+      );
       setFilters({
         dateRange: "any",
         paperType: "all",
@@ -264,25 +257,29 @@ export default function History() {
 
   // Function to get description - use reportText as-is or fallback
   const getDescription = (reportText, paper, searchQuery) => {
-    if (reportText && reportText.trim() !== "" && !reportText.includes("static test response")) {
+    if (
+      reportText &&
+      reportText.trim() !== "" &&
+      !reportText.includes("static test response")
+    ) {
       return reportText; // Return exactly as received from API
     }
-    
+
     // Enhanced fallback with search context
     const year = new Date(paper.publicationDate).getFullYear();
     const baseInfo = `Published in ${paper.journal} (${year})`;
-    
+
     if (searchQuery) {
       return `Found in search: "${searchQuery}" - ${baseInfo}`;
     }
-    
+
     return baseInfo;
   };
 
   const handleSearch = (query) => {
     console.log("Searching history for:", query);
     setSearchQuery(query);
-    
+
     if (query && query.trim() !== "") {
       // If there's a search query, filter the results
       const searchResults = allPapers.filter(
@@ -292,7 +289,8 @@ export default function History() {
             author.toLowerCase().includes(query.toLowerCase())
           ) ||
           item.reportText.toLowerCase().includes(query.toLowerCase()) ||
-          (item.searchQuery && item.searchQuery.toLowerCase().includes(query.toLowerCase()))
+          (item.searchQuery &&
+            item.searchQuery.toLowerCase().includes(query.toLowerCase()))
       );
       setPapers(searchResults);
     } else {
@@ -311,58 +309,50 @@ export default function History() {
   // Updated handleSavePaper function with API integration
   const handleSavePaper = async (paperId) => {
     console.log("Saving paper:", paperId);
-    
+
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
-      
-      const response = await fetch('http://localhost:3000/api/saved-papers/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          paperId: paperId,
-          notes: "Saved from search results for further research."
-        })
+      const response = await axiosInstance.post("/api/saved-papers/", {
+        paperId: paperId,
+        notes: "Saved from search results for further research.",
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        console.log("Paper saved successfully:", data);
+      if (response.status === 200 && response.data.success) {
+        console.log("Paper saved successfully:", response.data);
         // Add to saved papers set
-        setSavedPapers(prev => new Set([...prev, paperId]));
+        setSavedPapers((prev) => new Set([...prev, paperId]));
         return { success: true, message: "Paper saved successfully!" };
       } else {
-        console.error("Failed to save paper:", data.message || "Unknown error");
-        return { success: false, message: data.message || "Failed to save paper" };
+        console.error(
+          "Failed to save paper:",
+          response.data.message || "Unknown error"
+        );
+        return {
+          success: false,
+          message: response.data.message || "Failed to save paper",
+        };
       }
     } catch (error) {
       console.error("Error saving paper:", error);
-      return { success: false, message: "Network error occurred while saving paper" };
+      return {
+        success: false,
+        message: "Network error occurred while saving paper",
+      };
     }
   };
 
   // Handle unsaving papers (for when bookmark is clicked on saved papers)
   const handleUnsavePaper = async (paperId) => {
     console.log("Removing paper from saved:", paperId);
-    
-    try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODZhZDlmODBkYmM2YzZmNjRmYTZmYzgiLCJpYXQiOjE3NTE4MzMwODAsImV4cCI6MTc1MTkxOTQ4MH0.Y75HE6n5G7mLp4QMvtGGJS3T3B3aPmaX1a5hEGdkSg8";
-      
-      const response = await fetch(`http://localhost:3000/api/saved-papers/${paperId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
 
-      if (response.ok) {
+    try {
+      const response = await axiosInstance.delete(
+        `/api/saved-papers/${paperId}`
+      );
+
+      if (response.status === 200) {
         console.log("Paper unsaved successfully");
         // Remove from saved papers set
-        setSavedPapers(prev => {
+        setSavedPapers((prev) => {
           const newSet = new Set(prev);
           newSet.delete(paperId);
           return newSet;
@@ -381,7 +371,7 @@ export default function History() {
   // Handle save/unsave toggle
   const handleToggleSave = async (paperId) => {
     const isCurrentlySaved = savedPapers.has(paperId);
-    
+
     if (isCurrentlySaved) {
       return await handleUnsavePaper(paperId);
     } else {
@@ -389,22 +379,20 @@ export default function History() {
     }
   };
 
- 
-
   const handleViewPdf = (pdfUrl, title) => {
     console.log("Opening PDF modal:", pdfUrl, title);
     setPdfModal({
       isOpen: true,
       pdfUrl: pdfUrl,
-      title: title
+      title: title,
     });
   };
 
   const handleClosePdfModal = () => {
     setPdfModal({
       isOpen: false,
-      pdfUrl: '',
-      title: ''
+      pdfUrl: "",
+      title: "",
     });
   };
 
@@ -470,35 +458,38 @@ export default function History() {
                     Research History
                   </h2>
                 </div>
-                
+
                 {/* Loading Skeletons */}
                 <div className="space-y-4 sm:space-y-6">
                   {[1, 2, 3].map((index) => (
-                    <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+                    <div
+                      key={index}
+                      className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
+                    >
                       <div className="flex items-start space-x-4">
                         <div className="flex-1">
                           {/* Title skeleton */}
                           <div className="h-6 bg-gray-200 rounded mb-3 w-3/4"></div>
-                          
+
                           {/* Authors skeleton */}
                           <div className="h-4 bg-gray-200 rounded mb-2 w-1/2"></div>
-                          
+
                           {/* Journal skeleton */}
                           <div className="h-4 bg-gray-200 rounded mb-4 w-2/3"></div>
-                          
+
                           {/* Description skeleton */}
                           <div className="space-y-2">
                             <div className="h-4 bg-gray-200 rounded w-full"></div>
                             <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                           </div>
-                          
+
                           {/* Badges skeleton */}
                           <div className="flex space-x-2 mt-4">
                             <div className="h-6 bg-gray-200 rounded-full w-20"></div>
                             <div className="h-6 bg-gray-200 rounded-full w-16"></div>
                           </div>
                         </div>
-                        
+
                         {/* Action buttons skeleton */}
                         <div className="flex flex-col space-y-2">
                           <div className="h-8 bg-gray-200 rounded w-24"></div>
@@ -517,7 +508,7 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50  pt-20">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
@@ -568,7 +559,11 @@ export default function History() {
                 {papers.map((item) => {
                   const paper = item.paper;
                   const reportText = item.reportText || "";
-                  const description = getDescription(reportText, paper, item.searchQuery);
+                  const description = getDescription(
+                    reportText,
+                    paper,
+                    item.searchQuery
+                  );
                   const viewLink =
                     paper.pdfLink && paper.pdfLink.trim() !== ""
                       ? paper.pdfLink
@@ -599,12 +594,26 @@ export default function History() {
               {papers.length === 0 && searchQuery && (
                 <div className="text-center py-12">
                   <div className="text-gray-400 mb-4">
-                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="mx-auto h-12 w-12"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No papers found</h3>
-                  <p className="text-gray-500">Try searching with different keywords in your history.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No papers found
+                  </h3>
+                  <p className="text-gray-500">
+                    Try searching with different keywords in your history.
+                  </p>
                 </div>
               )}
 
@@ -630,7 +639,8 @@ export default function History() {
                     No search history
                   </h3>
                   <p className="text-gray-500">
-                    Your research history will appear here as you search for papers.
+                    Your research history will appear here as you search for
+                    papers.
                   </p>
                 </div>
               )}
@@ -639,29 +649,49 @@ export default function History() {
               {papers.length > 0 && (
                 <div className="flex items-center justify-center space-x-1 sm:space-x-2 mt-8 sm:mt-12">
                   <button className="p-2 text-gray-400 hover:text-gray-600 touch-manipulation">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
                     </svg>
                   </button>
-                  
+
                   <div className="flex space-x-1 sm:space-x-2">
                     {[1, 2, 3, 4, 5].map((page) => (
                       <button
                         key={page}
                         className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
-                          page === 1 
-                            ? 'bg-blue-600 text-white' 
-                            : 'text-gray-700 hover:bg-gray-100'
+                          page === 1
+                            ? "bg-blue-600 text-white"
+                            : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
                         {page}
                       </button>
                     ))}
                   </div>
-                  
+
                   <button className="p-2 text-gray-400 hover:text-gray-600 touch-manipulation">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </button>
                 </div>
