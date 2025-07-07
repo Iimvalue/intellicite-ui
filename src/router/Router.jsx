@@ -10,6 +10,13 @@ import Profile from "../pages/Profile";
 import Citation from "../pages/Citation";
 import LandingPage from "../pages/LandingPage";
 
+import {
+  Dashboard,
+  UserManagement,
+  Settings,
+  AdminProtectedRoute
+} from "../admin";
+
 const navigationList = [
   { label: 'Home', path: '/landing' },
   { label: "Search", path: "/search" },
@@ -78,6 +85,43 @@ const router = createBrowserRouter([
           <LandingPage/>
         ),
 
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    children: [
+      { 
+        path: "dashboard", 
+        element: (
+          <AdminProtectedRoute>
+            <Dashboard />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "users", 
+        element: (
+          <AdminProtectedRoute>
+            <UserManagement />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "settings", 
+        element: (
+          <AdminProtectedRoute>
+            <Settings />
+          </AdminProtectedRoute>
+        ) 
+      },
+      { 
+        path: "", 
+        element: (
+          <AdminProtectedRoute>
+            <Dashboard />
+          </AdminProtectedRoute>
+        ) 
       },
     ],
   },
