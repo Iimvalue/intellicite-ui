@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { login } from "./../services/authService";
-import { Bounce } from "react-toastify";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -39,14 +39,11 @@ function Login() {
       await login(email, password);
 
       toast.success("Login Successful", {
-        position: "top-center",
+           position: "top-center",
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        rtl: false,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
+        className:
+          "toast bg-blue-100 border-2 border-blue-300 text-blue-800 font-semibold rounded-lg shadow",
+        bodyClassName: "text-sm p-2",
       });
 
       setTimeout(() => {
@@ -64,16 +61,7 @@ function Login() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnFocusLoss
-        rtl={false}
-        theme="light"
-        transition={Bounce}
-      />
+          <ToastContainer />
       <div className="w-full max-w-md p-8">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Log In

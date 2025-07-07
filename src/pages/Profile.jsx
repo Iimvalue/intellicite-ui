@@ -5,6 +5,8 @@ import {
   isAuthenticated,
 } from "../services/authService";
 import { Navigate } from "react-router";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Profile() {
   const [name, setName] = useState("");
@@ -50,15 +52,28 @@ export default function Profile() {
     setName(editedName);
     setEmail(editedEmail);
     // setProfileImage(profileImage); 
-    alert("Profile updated successfully!");
+      toast.success("Profile updated successfully", {
+        position: "top-center",
+        autoClose: 3000,
+        className:
+          "toast bg-blue-100 border-2 border-blue-300 text-blue-800 font-semibold rounded-lg shadow",
+        bodyClassName: "text-sm p-2",
+      });
   } catch (error) {
     console.error("Failed to update profile:", error);
-    alert("Failed to update profile. Please try again.");
+    toast.error("Failed to update profile. Please try again", {
+        position: "top-center",
+        autoClose: 3000,
+        className:
+          "toast bg-red-100 border-2 border-red-300 text-red-800 font-semibold rounded-lg shadow",
+        bodyClassName: "text-sm p-2",
+      });
   }
 };
 
   return (
     <>
+        <ToastContainer />
       {isAuthenticated() ? (
         <div className="min-h-screen bg-gray-50 py-12 px-4">
           <div className="max-w-4xl mx-auto space-y-10">
