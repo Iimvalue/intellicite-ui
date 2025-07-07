@@ -74,9 +74,9 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
        <Toast ref={toast} />
-      <div className="w-full max-w-md p-8">
+<div className="w-full max-w-md p-8 rounded-2xl bg-gray-200/20 backdrop-blur-md border border-gray-300/30 shadow-lg">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Log In
         </h2>
@@ -86,10 +86,10 @@ function Login() {
           </label>
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder="example@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full p-3 border ${
+            className={`w-full p-3 border bg-white ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
           />
@@ -106,7 +106,7 @@ function Login() {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={`w-full p-3 border ${
+            className={`w-full p-3 border bg-white ${
               errors.password ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
           />
