@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router";
-import Swal from "sweetalert2";
+import { Toast } from 'primereact/toast';
 import { login } from "./../services/authService";
 
+
+
 function Login() {
+    const toast = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({
@@ -34,27 +37,45 @@ function Login() {
     if (emailError || passwordError) return;
 
     try {
-      const response = await login(email, password);
+      await login(email, password);
 
-Swal.fire({
-        title: "Login Successful",
-        text: "Welcome back!",
-        icon: "success",
-        timer: 3000,
-        showConfirmButton: false,
-      }).then(() => navigate("/"));
+           toast.current.show({
+        severity: "success",
+        summary: "Login Successful",
+        detail: "You have been logged in successfully!",
+        life: 3000,
+      });
+
+      setTimeout(() => {
+        navigate("/search");
+      }, 3000);
     } catch (error) {
-      const message = error.response.data.message || error.message;
+  const backendMsg = error.response?.data?.message;
 
-      setErrors((prev) => ({
-        ...prev,
-        general: message,
+  let customMessage = "Invalid email or password";
+  if (backendMsg === "User not found") {
+    customMessage = "No account with this email";
+  } else if (backendMsg === "Incorrect password") {
+    customMessage = "The password is incorrect";
+  }
+
+  // toast.current.show({
+  //   severity: "error",
+  //   summary: "Login Failed",
+  //   detail: customMessage,
+  //   life: 3000,
+  // });
+
+  setErrors((prev) => ({
+    ...prev,
+    general: customMessage,
       }));
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+       <Toast ref={toast} />
       <div className="w-full max-w-md p-8">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Log In
@@ -67,7 +88,7 @@ Swal.fire({
             type="email"
             placeholder="your@email.com"
             value={email}
-             onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className={`w-full p-3 border ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}

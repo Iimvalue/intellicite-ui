@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+
 import {
   getProfile,
   updateProfile,
   isAuthenticated,
 } from "../services/authService";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 
 export default function Profile() {
   const [name, setName] = useState("");
@@ -14,28 +20,34 @@ export default function Profile() {
   const [profileImage, setProfileImage] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const toast = useRef(null);
+
   useEffect(() => {
-    const ChangeProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        if (!isAuthenticated()) {
-          throw new Error("User is not authenticated");
-        }
+        if (!isAuthenticated()) throw new Error("User is not authenticated");
         const userProfile = await getProfile();
         setName(userProfile.user.name);
         setEmail(userProfile.user.email);
         setEditedName(userProfile.user.name);
         setEditedEmail(userProfile.user.email);
-        console.log(userProfile);
-        // setProfileImage(userProfile.profileImage);
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       } finally {
         setLoading(false);
       }
     };
-    console.log(isAuthenticated());
-    ChangeProfile();
+    fetchProfile();
   }, []);
+
+  const confirmUpdate = () => {
+    confirmDialog({
+      group: 'update-profile',
+      message: 'Are you sure you want to update your profile?',
+      header: 'Confirm Update',
+      icon: 'pi pi-exclamation-triangle',
+    });
+  };
 
   if (loading) {
     return (
@@ -44,50 +56,93 @@ export default function Profile() {
       </div>
     );
   }
- const handleUpdateProfile = async () => {
-  try {
-    await updateProfile(editedName, editedEmail, profileImage);
-    setName(editedName);
-    setEmail(editedEmail);
-    // setProfileImage(profileImage); 
-    alert("Profile updated successfully!");
-  } catch (error) {
-    console.error("Failed to update profile:", error);
-    alert("Failed to update profile. Please try again.");
-  }
-};
 
   return (
     <>
+      <Toast ref={toast} />
+
+      <ConfirmDialog
+        group="update-profile"
+        content={({ headerRef, contentRef, footerRef, hide, message }) => (
+          <div className="flex flex-col items-center p-6 bg-white rounded-xl shadow-xl max-w-sm mx-auto">
+            <div className="rounded-full bg-blue-800 flex items-center justify-center h-24 w-24 -mt-12">
+              <i className="pi pi-question text-white" style={{ fontSize: '40px' }}></i>
+            </div>
+            <span className="font-bold text-xl mt-6 mb-2 text-gray-800" ref={headerRef}>
+              {message.header}
+            </span>
+            <p className="text-center text-gray-600 text-sm mb-4" ref={contentRef}>
+              {message.message}
+            </p>
+            <div className="flex justify-center gap-3" ref={footerRef}>
+              <button
+                onClick={async (e) => {
+                  hide(e);
+                  try {
+                    await updateProfile(editedName, editedEmail, profileImage);
+                    setName(editedName);
+                    setEmail(editedEmail);
+                    toast.current.show({
+                      severity: 'success',
+                      summary: 'Updated',
+                      detail: 'Profile updated successfully',
+                      life: 3000,
+                    });
+                  } catch (error) {
+                    console.error("Update failed:", error);
+                    toast.current.show({
+                      severity: 'error',
+                      summary: 'Failed',
+                      detail: 'Failed to update profile. Try again.',
+                      life: 3000,
+                    });
+                  }
+                }}
+                className="px-5 py-2 text-white bg-blue-800 hover:bg-blue-700 rounded text-sm"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={(e) => {
+                  hide(e);
+                  toast.current.show({
+                    severity: 'warn',
+                    summary: 'Cancelled',
+                    detail: 'Update was cancelled',
+                    life: 2000,
+                  });
+                }}
+                className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      />
+
       {isAuthenticated() ? (
         <div className="min-h-screen bg-gray-50 pt-25">    {/* Main Content */}
         <div className="max-w-4xl mx-auto space-y-10">
-            <div className="bg-white rounded-xl shadow p-6 sm:flex flex-col text-center sm:flex-row justify-center  sm:justify-start items-center gap-6">
-              <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-3xl text-white">
-                <img
-                  className="w-full h-full object-cover rounded-full"
-                  src={null}
-                  alt=""
-                />
+            <div className="bg-white rounded-xl shadow p-6 sm:flex flex-col text-center sm:flex-row justify-center sm:justify-start items-center gap-6">
+              <div className="w-16 h-16 bg-blue-800 rounded-full flex items-center justify-center text-2xl text-white font-bold">
+                {profileImage ? (
+                  <img
+                    className="w-full h-full object-cover rounded-full"
+                    src={profileImage}
+                    alt="Profile"
+                  />
+                ) : (
+                  name.charAt(0).toUpperCase()
+                )}
               </div>
               <div>
                 <div className="flex items-center">
-                  <label
-                    htmlFor="name"
-                    className="text-gray-700 text-lg font-semibold mr-2"
-                  >
-                    Name:
-                  </label>
+                  <label className="text-gray-700 text-lg font-semibold mr-2">Name:</label>
                   <p className="text-lg text-blue-800">{name}</p>
                 </div>
-
                 <div className="flex items-center">
-                  <label
-                    htmlFor="email"
-                    className="text-gray-700 text-lg font-semibold mr-2"
-                  >
-                    Email:
-                  </label>
+                  <label className="text-gray-700 text-lg font-semibold mr-2">Email:</label>
                   <p className="text-lg text-blue-800">{email}</p>
                 </div>
               </div>
@@ -100,45 +155,29 @@ export default function Profile() {
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-gray-700 mb-1 font-medium">
-                    Full Name
-                  </label>
+                  <label className="block text-gray-700 mb-1 font-medium">Full Name</label>
                   <input
                     type="text"
-                    placeholder="Enter Your Full Name"
                     className="w-full border border-gray-300 rounded px-4 py-2"
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700  mb-1 font-medium">
-                    Email Address
-                  </label>
+                  <label className="block text-gray-700 mb-1 font-medium">Email Address</label>
                   <input
                     type="email"
-                    placeholder="Enter Your Email Address"
                     className="w-full border border-gray-300 rounded px-4 py-2"
                     value={editedEmail}
                     onChange={(e) => setEditedEmail(e.target.value)}
                   />
                 </div>
-                {/* <div>
-                <label className="block text-gray-700 mb-1 font-medium">Profile Image</label>
-                <input
-                    type="text"
-                    placeholder="Image URL"
-                    className="w-full border border-gray-300 rounded px-4 py-2"
-                    value={profileImage}
-                    onChange={(e) => setProfileImage(e.target.value)}
-                />
-                </div> */}
                 <div className="pt-4">
                   <button
-                     className="w-full bg-blue-800 text-white font-bold py-3 rounded mt-2 hover:bg-blue-700 transition-colors text-lg cursor-pointer"
-                    onClick={handleUpdateProfile}
+                    className="w-full bg-blue-800 text-white font-bold py-3 rounded mt-2 hover:bg-blue-700 transition-colors text-lg cursor-pointer"
+                    onClick={confirmUpdate}
                   >
-                    Change
+                    Update Profile
                   </button>
                 </div>
               </div>
@@ -146,7 +185,7 @@ export default function Profile() {
           </div>
         </div>
       ) : (
-        <Navigate to="/login" replace={true} />
+        <Navigate to="/login" replace />
       )}
     </>
   );

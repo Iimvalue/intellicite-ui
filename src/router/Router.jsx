@@ -16,7 +16,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Citation from "../pages/Citation";
-
+import LandingPage from "../pages/LandingPage";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -29,9 +29,9 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-
 const navigationList = [
-  { label: "Home", path: "/" },
+  { label: "Home", path: "/landing" },
+  { label: "Search", path: "/search" },
   { label: "History", path: "/history" },
   { label: "Save Papers", path: "/save-papers" },
   { label: "Citation Evaluation", path: "/citation" },
@@ -43,7 +43,6 @@ const footerNavigation = [
   { label: "Terms of Service", path: "/terms" },
   { label: "Privacy Policy", path: "/privacy" },
 ];
-
 
 function Layout() {
   return (
@@ -58,18 +57,15 @@ function Layout() {
   );
 }
 
-
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-
-      { path: "/", element: <Home /> },
+      { path: "search", element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
-      { path: "citation", element: <Citation /> }, 
-
+      { path: "citation", element: <Citation /> },
 
       {
         element: <ProtectedRoute />,
@@ -79,6 +75,10 @@ const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
           { path: "poster", element: <h1>Poster Creation</h1> },
         ],
+      },
+      {
+        path: "landing",
+        element: <LandingPage />,
       },
     ],
   },
