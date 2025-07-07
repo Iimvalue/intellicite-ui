@@ -99,7 +99,7 @@ const Header = ({ logo, navigationItems = [] }) => {
                 <Link to="/landing" className="flex items-center">
                   {logo ? (
                     typeof logo === "string" ? (
-                      <img src={logo} alt="Logo" className="h-12 w-12 rounded-full" />
+                      <img src={logo} alt="Logo" className="h-12 w-12  rounded-2xl" />
                     ) : logo
                   ) : (
                     <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-900 text-white">
