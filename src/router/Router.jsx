@@ -14,7 +14,7 @@ const navigationList = [
   { label: 'Home', path: '/landing' },
   { label: "Search", path: "/search" },
   { label: "History", path: "/history" },
-  { label: "Save Papers", path: "/save-papers" },
+  { label: "Bookmarks", path: "/bookmarks" },
   { label: "Citation Evaluation", path: "/citation" },
 ];
 
@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         element: <History />
       },
       {
-        path: "save-papers",
+        path: "bookmarks",
         element: <Save />,
       },
       {
