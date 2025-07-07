@@ -105,7 +105,7 @@ function Citation() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Research Topic"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white "
               />
             </div>
 
@@ -119,7 +119,7 @@ function Citation() {
                 value={doi}
                 onChange={(e) => setDoi(e.target.value)}
                 placeholder="e.g 10.1000/xyz123"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white "
               />
             </div>
 

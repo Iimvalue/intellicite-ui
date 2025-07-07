@@ -88,9 +88,9 @@ function Register() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
          <Toast ref={toast} />
-      <div className="w-full max-w-md p-8">
+  <div className="w-full max-w-md p-8 rounded-2xl bg-gray-200/20 backdrop-blur-md border border-gray-300/30 shadow-lg">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Register
         </h2>
@@ -102,7 +102,7 @@ function Register() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className={`w-full p-3 border ${
+            className={`w-full p-3 border bg-white ${
               errors.name ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
             placeholder="Your name"
@@ -119,7 +119,7 @@ function Register() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full p-3 border ${
+            className={`w-full p-3 border bg-white ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
             placeholder="you@example.com"
@@ -137,7 +137,7 @@ function Register() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={`w-full p-3 border ${
+            className={`w-full p-3 border bg-white ${
               errors.password ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
             placeholder="Your password"
@@ -161,10 +161,11 @@ function Register() {
         </button>
         <div className="text-center mt-4">
         <span className="text-sm text-gray-500">
-            Already have an account?
-          </span>
-          <Link to="/login" className="text-blue-700 hover:underline text-sm">
-            Log In
+            Already have an account? </span>
+          <Link to="/login" 
+             className="text-sm text-blue-800 hover:underline"
+          >
+             Log In
           </Link>
         </div>
       </div>
