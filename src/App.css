@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "primereact/resources/themes/lara-light-indigo/theme.css";
 @keyframes typingPause {
   0% {
     width: 0%;

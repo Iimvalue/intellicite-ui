@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { register } from "./../services/authService";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Toast } from 'primereact/toast';
+
 
 function Register() {
+   const toast = useRef(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,30 +52,44 @@ function Register() {
 
     try {
       const response = await register(name, email, password);
-         toast.success("Login Successful", {
-           position: "top-center",
-        autoClose: 3000,
-        className:
-          "toast bg-blue-100 border-2 border-blue-300 text-blue-800 font-semibold rounded-lg shadow",
-        bodyClassName: "text-sm p-2",
-      });
-
+  
+  toast.current.show({
+    severity: "success",
+    summary: "Welcome!",
+    detail: "You're now signed up! Redirecting...",
+    life: 3000,
+  });
       setTimeout(() => {
         navigate("/search");
       }, 3000);
     } catch (error) {
-      const message = error.response.data.message || error.message;
+  const backendMsg = error.response?.data?.message;
 
-      setErrors((prev) => ({
-        ...prev,
-        general: message,
+  let customMessage = "Something went wrong. Please try again";
+
+  if (backendMsg === "User with this email already exists") {
+    customMessage = "This email is already registered, Please login";
+  } else if (backendMsg === "Name, email, and password are required") {
+    customMessage = "Please fill out all the fields";
+  }
+
+  // toast.current.show({
+  //   severity: "error",
+  //   summary: "Registration Failed",
+  //   detail: customMessage,
+  //   life: 3000,
+  // });
+
+  setErrors((prev) => ({
+    ...prev,
+    general: customMessage,
       }));
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-         <ToastContainer />
+         <Toast ref={toast} />
       <div className="w-full max-w-md p-8">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Register
