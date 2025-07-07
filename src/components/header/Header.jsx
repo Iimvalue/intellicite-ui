@@ -1,13 +1,19 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/button";
-
+import { logout, isAuthenticated } from "../../services/authService";
+import Swal from "sweetalert2";
 const Header = ({ logo, navigationItems = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const navRef = useRef(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [fontSize, setFontSize] = useState(100);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, [location.pathname]);
 
   const increaseFont = () => {
     const newSize = Math.min(fontSize + 10, 150);
@@ -28,7 +34,32 @@ const Header = ({ logo, navigationItems = [] }) => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of your account.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, log me out",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+        setIsLoggedIn(false);
+  
+        Swal.fire({
+          title: "Logged out",
+          text: "You have been successfully logged out.",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          navigate("/login");
+        });
+      }
+    });
+  };
   return (
     <header
       className="w-full  bg-white border-b fixed top-0 left-0 z-50"
@@ -54,7 +85,6 @@ const Header = ({ logo, navigationItems = [] }) => {
             </button>
           </div>
         </div>
-
 
         <div className="lg:py-1">
           <div className="flex items-center justify-between">
@@ -128,16 +158,23 @@ const Header = ({ logo, navigationItems = [] }) => {
                 ))}
               </div>
             </nav>
-
-            {/* Sign In */}
-            <Button
-              onClick={handleSignIn}
-              className="text-sm font-medium transition-colors duration-200 py-2 whitespace-nowrap bg-[#1341F8] hover:bg-[#1e3b8a] cursor-pointer"
-              style={{ color: "white" }}
-            >
-              Sign In
-            </Button>
-
+            {isLoggedIn ? (
+  <Button
+    onClick={handleLogout}
+    className="text-sm font-medium transition-colors duration-200 py-2 whitespace-nowrap bg-red-500 hover:bg-red-600"
+    style={{ color: "white" }}
+  >
+    Logout
+  </Button>
+) : (
+  <Button
+    onClick={handleSignIn}
+    className="text-sm font-medium transition-colors duration-200 py-2 whitespace-nowrap bg-[#1341F8] hover:bg-[#1e3b8a]"
+    style={{ color: "white" }}
+  >
+    Sign In
+  </Button>
+)}
             {/* Mobile menu button */}
             <button
               onClick={toggleMobileMenu}

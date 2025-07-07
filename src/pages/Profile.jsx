@@ -60,8 +60,8 @@ export default function Profile() {
   return (
     <>
       {isAuthenticated() ? (
-        <div className="min-h-screen bg-white py-12 px-4">
-          <div className="max-w-4xl mx-auto space-y-10">
+        <div className="min-h-screen bg-gray-50 pt-25">    {/* Main Content */}
+        <div className="max-w-4xl mx-auto space-y-10">
             <div className="bg-white rounded-xl shadow p-6 sm:flex flex-col text-center sm:flex-row justify-center  sm:justify-start items-center gap-6">
               <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center text-3xl text-white">
                 <img
