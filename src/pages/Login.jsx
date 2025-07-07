@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { login } from "./../services/authService";
+import { Bounce } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -34,15 +36,22 @@ function Login() {
     if (emailError || passwordError) return;
 
     try {
-      const response = await login(email, password);
+      await login(email, password);
 
-Swal.fire({
-        title: "Login Successful",
-        text: "Welcome back!",
-        icon: "success",
-        timer: 3000,
-        showConfirmButton: false,
-      }).then(() => navigate("/"));
+      toast.success("Login Successful", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        rtl: false,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+
+      setTimeout(() => {
+        navigate("/search");
+      }, 3000);
     } catch (error) {
       const message = error.response.data.message || error.message;
 
@@ -55,6 +64,16 @@ Swal.fire({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnFocusLoss
+        rtl={false}
+        theme="light"
+        transition={Bounce}
+      />
       <div className="w-full max-w-md p-8">
         <h2 className="text-gray-700 text-3xl font-bold mb-8 text-center">
           Log In
@@ -67,7 +86,7 @@ Swal.fire({
             type="email"
             placeholder="your@email.com"
             value={email}
-             onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className={`w-full p-3 border ${
               errors.email ? "border-red-500" : "border-gray-200"
             } rounded focus:outline-none focus:ring-2 focus:ring-blue-200`}
