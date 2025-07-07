@@ -96,7 +96,7 @@ export default function History() {
     return <div className="text-red-600 text-center mt-10">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen  bg-gray-50 p20">
       {" "}
       {/* Main Content */}
 
