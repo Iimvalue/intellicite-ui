@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import PdfModal from "../components/modal/Modal";
 import PaperCitation from "../components/cards/paper/PaperCitation";
@@ -11,6 +11,7 @@ function Citation() {
   const [loading, setLoading] = useState(false);
   const [paper, setPaper] = useState(null);
   const [error, setError] = useState(null);
+  const [savedPapers, setSavedPapers] = useState(new Set()); // Track saved paper IDs
   const [pdfModal, setPdfModal] = useState({
     isOpen: false,
     pdfUrl: "",
@@ -69,6 +70,56 @@ function Citation() {
     if (reportText?.trim()) return reportText;
     const year = new Date(paper.publicationDate).getFullYear();
     return `Published in ${paper.journal} (${year})`;
+  };
+
+    // Load saved papers on component mount
+    useEffect(() => {
+      loadPersistedState();
+    }, []);
+  
+    // Debug effect to log saved papers state
+    useEffect(() => {
+      console.log("Saved papers updated:", Array.from(savedPapers));
+    }, [savedPapers]);
+
+    // Load persisted state from localStorage
+  const loadPersistedState = () => {
+    try {
+      const savedState = localStorage.getItem("homePageState");
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+
+        // Check if saved state is not too old (e.g., 24 hours)
+        const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        if (Date.now() - parsedState.timestamp < MAX_AGE) {
+          setSearchQuery(parsedState.searchQuery || "");
+          setPapers(parsedState.papers || []);
+          setAllPapers(parsedState.allPapers || []);
+          setFilters(
+            parsedState.filters || {
+              dateRange: "any",
+              paperType: "all",
+              citationRange: "any",
+              accessType: "all",
+            }
+          );
+          console.log("Home state restored from localStorage:", parsedState);
+        } else {
+          // Clear old state if it's too old
+          localStorage.removeItem("homePageState");
+          console.log("Old home state cleared");
+        }
+      }
+    } catch (error) {
+      console.error("Error loading persisted state:", error);
+      localStorage.removeItem("homePageState");
+    }
+  };
+
+  // Clear persisted state (can be called when needed)
+  const clearPersistedState = () => {
+    localStorage.removeItem("homePageState");
+    console.log("Home state cleared from localStorage");
   };
 
   return (

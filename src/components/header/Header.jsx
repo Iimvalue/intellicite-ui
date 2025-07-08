@@ -125,7 +125,7 @@ const Header = ({ logo, navigationItems = [] }) => {
             <div className="flex items-center justify-between m-1 ">
               {/* Logo */}
               <div className="flex-shrink-0">
-                <Link to="/landing" className="flex items-center">
+                <Link to="/" className="flex items-center">
                   {logo ? (
                     typeof logo === "string" ? (
                       <img

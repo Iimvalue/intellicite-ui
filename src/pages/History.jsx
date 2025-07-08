@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PdfModal from "../components/modal/Modal";
 import axiosInstance from "../services/axiosInstance";
+import { Button } from "../components/ui/button";
+import { Filter } from "lucide-react";
 
 export default function History() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,6 +13,10 @@ export default function History() {
   const [allPapers, setAllPapers] = useState([]); // Store original unfiltered results
   const [savedPapers, setSavedPapers] = useState(new Set()); // Track saved paper IDs
   const [loading, setLoading] = useState(true);
+  // Mobile filter visibility
+  const [showFiltersMobile, setShowFiltersMobile] = useState(false);
+  const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
+
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     dateRange: "any",
@@ -139,7 +145,7 @@ export default function History() {
   // Fetch saved papers to check which ones are already saved
   const fetchSavedPaperIds = async () => {
     try {
-      const response = await axiosInstance.get("/api/saved-papers/");
+      const response = await axiosInstance.get("/api/bookmarks/");
 
       if (response.status === 200) {
         const data = response.data;
@@ -342,7 +348,7 @@ export default function History() {
     console.log("Saving paper:", paperId);
 
     try {
-      const response = await axiosInstance.post("/api/saved-papers/", {
+      const response = await axiosInstance.post("/api/bookmarks/", {
         paperId: paperId,
         notes: "Saved from search results for further research.",
       });
@@ -377,7 +383,7 @@ export default function History() {
 
     try {
       const response = await axiosInstance.delete(
-        `/api/saved-papers/${paperId}`
+        `/api/bookmarks/${paperId}`
       );
 
       if (response.status === 200) {
@@ -520,7 +526,7 @@ export default function History() {
                             <div className="h-6 bg-gray-200 rounded-full w-16"></div>
                           </div>
                         </div>
-}
+
 
                         {/* Action buttons skeleton */}
                         <div className="flex flex-col space-y-2">
@@ -540,31 +546,65 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50  pt-20">
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
-          {/* Left Sidebar - Filter Panel */}
-          <div className="w-full lg:w-80 lg:flex-shrink-0 order-2 lg:order-1">
-            <FilterDropdown
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onApplyFilter={handleApplyFilter}
-              className="lg:sticky lg:top-4"
-            />
-          </div>
-
-          {/* Right Content Area */}
-          <div className="flex-1 space-y-6 sm:space-y-8 order-1 lg:order-2">
-            {/* Search Bar */}
-            <SearchBar
-              placeholder="Search your research history"
-              onSearch={handleSearch}
-              onInputChange={setSearchQuery}
-              initialValue={searchQuery}
-              className="w-full"
-            />
-
+        <div className="min-h-screen bg-gray-50 pt-20 lg:px-20">
+          {/* Main Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+              {/* Left Sidebar - Filter Panel */}
+              <div className="w-full lg:w-80 lg:flex-shrink-0 hidden lg:block lg:sticky lg:top-4">
+                <FilterDropdown
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onApplyFilter={handleApplyFilter}
+                  className="lg:sticky lg:top-4"
+                />
+              </div>
+              {/* Right Content Area */}
+              <div className="flex-1 space-y-6 sm:space-y-8 ">
+                {/* Mobile only: SearchBar + Filter side by side */}
+                <div className="flex items-center gap-2 lg:hidden mb-4 w-full">
+                  <div className="flex-1">
+                    <SearchBar
+                      placeholder="Enter Your Research Topic"
+                      onSearch={handleSearch}
+                      onInputChange={setSearchQuery}
+                      initialValue={searchQuery}
+                      className="w-full"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="px-5 py-6 text-sm"
+                    onClick={() => setShowFiltersMobile((prev) => !prev)}
+                  >
+                    <Filter className="w-5 h-5" />
+                  </Button>
+                </div>
+    
+                {/* Desktop only: Full-width SearchBar */}
+                <div className="hidden lg:block mb-4 w-full">
+                  <SearchBar
+                    placeholder="Enter Your Research Topic"
+                    onSearch={handleSearch}
+                    onInputChange={setSearchQuery}
+                    initialValue={searchQuery}
+                    className="w-full"
+                  />
+                </div>
+    
+                {/* Mobile FilterDropdown (after search & button) */}
+                {showFiltersMobile && (
+                  <div className="lg:hidden mb-6">
+                    <FilterDropdown
+                      filters={filters}
+                      onFilterChange={handleFilterChange}
+                      onApplyFilter={handleApplyFilter}
+                      className="lg:sticky lg:top-4"
+                    />
+                  </div>
+                )}
+                
             {/* Results Section */}
             <div>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -679,57 +719,6 @@ export default function History() {
                 </div>
               )}
 
-              {/* Pagination */}
-              {papers.length > 0 && (
-                <div className="flex items-center justify-center space-x-1 sm:space-x-2 mt-8 sm:mt-12">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 touch-manipulation">
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </button>
-
-                  <div className="flex space-x-1 sm:space-x-2">
-                    {[1, 2, 3, 4, 5].map((page) => (
-                      <button
-                        key={page}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
-                          page === 1
-                            ? "bg-blue-600 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button className="p-2 text-gray-400 hover:text-gray-600 touch-manipulation">
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              )}
               
             </div>
           </div>
