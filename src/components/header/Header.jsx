@@ -70,13 +70,35 @@ const Header = ({ logo, navigationItems = [] }) => {
 
   const handleLogout = () => {
     confirmDialog({
-      message: "You will be logged out of your account.",
-      header: "Are you sure?",
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
+      message: (
+        <div className="flex items-center space-x-3">
+          <i className="pi pi-exclamation-triangle text-yellow-500 text-2xl"></i>
+          <span className="text-gray-700">
+            You will be logged out of your account. Are you sure?
+          </span>
+        </div>
+      ),
+      header: (
+        <div className="flex items-center space-x-3">
+          <i className="pi pi-sign-out text-red-500 text-2xl"></i>
+          <span className="text-gray-800 font-semibold">Confirm Logout</span>
+        </div>
+      ),
+      icon: null,
+      acceptClassName: "p-button-danger bg-red-600 hover:bg-red-700",
       acceptLabel: "Yes, log me out",
       rejectLabel: "Cancel",
-      accept: () => {
+      accept: async () => {
+        toast.current.show({
+          severity: "info",
+          summary: "Logging out...",
+          detail: "Please wait while we log you out.",
+          life: 2000,
+        });
+
+        // Simulate a loading delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         logout();
         setIsLoggedIn(false);
         toast.current.show({

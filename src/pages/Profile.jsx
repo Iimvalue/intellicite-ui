@@ -48,11 +48,10 @@ export default function Profile() {
       icon: 'pi pi-exclamation-triangle',
     });
   };
-
   if (loading) {
     return (
-      <div className="flex text-gray-700 items-center justify-center min-h-screen">
-        Loading...
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-800 border-solid"></div>
       </div>
     );
   }
