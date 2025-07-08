@@ -396,6 +396,18 @@ export default function Home() {
     // This function can be removed as we're using the comprehensive filter
   };
 
+  // const handleCopyDOI = (doi) => {
+  //   if (!doi) return;
+  
+  //   navigator.clipboard
+  //     .writeText(doi)
+  //     .then(() => {
+  //       alert("DOI copied to clipboard!");
+  //     })
+  //     .catch(() => {
+  //       alert("Failed to copy DOI.");
+  //     });
+  // };
   return (
     <div className="min-h-screen bg-gray-50 p-20">
       {/* Main Content */}
@@ -480,6 +492,8 @@ export default function Home() {
                         onViewPaper={(link) => handleViewPaper(paper._id, link)}
                         onViewPdf={handleViewPdf}
                         className="w-full"
+                        handleCopyDOI={handleCopyDOI}
+                        doi={paper.doi || ""}
                       />
                     );
                   })}

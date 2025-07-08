@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import { FiClipboard } from "react-icons/fi";
+
 const PaperCard = ({
   badges = [],
   title,
@@ -271,36 +273,36 @@ const PaperCard = ({
         };
     }
   };
-  const handleCopyDOI = () => {
-    console.log("DOI:", doi);
-    if (navigator.clipboard && doi) {
-      navigator.clipboard
-        .writeText(doi)
-        .then(() => {
-          toast.current.show({
-            severity: "success",
-            summary: "Copied",
-            detail: "DOI copied to clipboard",
-            life: 3000,
-          });
-        })
-        .catch(() => {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Failed to copy DOI",
-            life: 3000,
-          });
-        });
-    } else {
-      toast.current.show({
-        severity: "warn",
-        summary: "Not Available",
-        detail: "DOI not available",
-        life: 3000,
-      });
-    }
-  };
+  // const handleCopyDOI = () => {
+  //   console.log("DOI:", doi);
+  //   // if (navigator.clipboard && doi) {
+  //   //   navigator.clipboard
+  //   //     .writeText(doi)
+  //   //     .then(() => {
+  //   //       toast.current.show({
+  //   //         severity: "success",
+  //   //         summary: "Copied",
+  //   //         detail: "DOI copied to clipboard",
+  //   //         life: 3000,
+  //   //       });
+  //   //     })
+  //   //     .catch(() => {
+  //   //       toast.current.show({
+  //   //         severity: "error",
+  //   //         summary: "Error",
+  //   //         detail: "Failed to copy DOI",
+  //   //         life: 3000,
+  //   //       });
+  //   //     });
+  //   // } else {
+  //   //   toast.current.show({
+  //   //     severity: "warn",
+  //   //     summary: "Not Available",
+  //   //     detail: "DOI not available",
+  //   //     life: 3000,
+  //   //   });
+  //   // }
+  // };
 
   const handleSavePaper = async () => {
     if (isLoading) return;
@@ -356,6 +358,29 @@ const PaperCard = ({
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
+  const handleCopyDOI = (doi) => {
+    if (!doi) return;
+
+    navigator.clipboard
+      .writeText(doi)
+      .then(() => {
+        toast.current.show({
+          severity: "success",
+          summary: "Copied",
+          detail: "DOI copied to clipboard",
+          life: 3000,
+        });
+      })
+      .catch(() => {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to copy DOI",
+          life: 3000,
+        });
+      });
+  };
+
 
   const shouldShowViewMore = description && description.length > 200;
 
@@ -472,14 +497,17 @@ const PaperCard = ({
         <div className="flex items-center justify-between">
           {/* Citation Count */}
           {/* Copy DOI Button */}
-          <div className="flex items-center text-gray-500">
-            <button
-              onClick={handleCopyDOI}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium px-4 py-1.5 rounded-full shadow-sm border border-gray-300"
-            >
-              Copy DOI
-            </button>
-          </div>
+          <div className="flex items-center text-gray-500 space-x-2">
+      {/* <span className="text-sm text-gray-700 truncate max-w-[70%] bg-gray-100 p-2 rounded-md">Doi</span> */}
+
+      <button
+        onClick={() => handleCopyDOI(doi)}
+        className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+        title={doi}
+      >
+        <FiClipboard size={18} />
+      </button>
+    </div>
           {/* Action Button */}
           <Button
             onClick={handleViewPaper}

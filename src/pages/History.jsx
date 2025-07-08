@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PdfModal from "../components/modal/Modal";
 import axiosInstance from "../services/axiosInstance";
+
 export default function History() {
   const [searchQuery, setSearchQuery] = useState("");
   const [papers, setPapers] = useState([]);
