@@ -111,7 +111,7 @@ export const updateProfile = async (name, email, profileImage) => {
 
 // Logout function: Clears the authentication token from localStorage
 export const logout = () => {
-  localStorage.removeItem("token");
+  localStorage.clear();
   // Since user data is NOT stored in localStorage, no need to clear it here
 };
 
