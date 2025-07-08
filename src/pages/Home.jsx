@@ -5,6 +5,8 @@ import SearchBar from "../components/searchbar/SearchBar";
 import PaperCard from "../components/cards/paper/PaperCard";
 import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
 import axiosInstance from "../services/axiosInstance";
+import { Button } from "../components/ui/button";
+import { Filter } from "lucide-react";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,6 +14,10 @@ export default function Home() {
   const [allPapers, setAllPapers] = useState([]); // Store original unfiltered results
   const [savedPapers, setSavedPapers] = useState(new Set()); // Track saved paper IDs
   const [loading, setLoading] = useState(false);
+  // Mobile filter visibility
+  const [showFiltersMobile, setShowFiltersMobile] = useState(false)
+const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
+
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     dateRange: "any",
@@ -397,12 +403,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-20">
+    <div className="min-h-screen bg-gray-50 pt-20 lg:px-20"> 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Sidebar - Filter Panel */}
-          <div className="w-full lg:w-80 lg:flex-shrink-0 order-2 lg:order-1">
+          <div className="w-full lg:w-80 lg:flex-shrink-0 hidden lg:block lg:sticky lg:top-4">
             <FilterDropdown
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -410,17 +416,55 @@ export default function Home() {
               className="lg:sticky lg:top-4"
             />
           </div>
+{/* Right Content Area */}
+<div className="flex-1 space-y-6 sm:space-y-8 ">
 
-          {/* Right Content Area */}
-          <div className="flex-1 space-y-6 sm:space-y-8 order-1 lg:order-2">
-            {/* Search Bar */}
-            <SearchBar
-              placeholder="Enter Your Research Topic"
-              onSearch={handleSearch}
-              onInputChange={setSearchQuery}
-              initialValue={searchQuery}
-              className="w-full"
+  {/* Mobile only: SearchBar + Filter side by side */}
+  <div className="flex items-center gap-2 lg:hidden mb-4 w-full">
+    <div className="flex-1">
+      <SearchBar
+        placeholder="Enter Your Research Topic"
+        onSearch={handleSearch}
+        onInputChange={setSearchQuery}
+        initialValue={searchQuery}
+        className="w-full"
+      />
+    </div>
+    <Button
+      variant="outline"
+      size="icon"
+           className="px-5 py-6 text-sm"
+      onClick={() => setShowFiltersMobile((prev) => !prev)}
+    >
+      <Filter className="w-5 h-5" />
+    </Button>
+  </div>
+
+  {/* Desktop only: Full-width SearchBar */}
+  <div className="hidden lg:block mb-4 w-full">
+    <SearchBar
+      placeholder="Enter Your Research Topic"
+      onSearch={handleSearch}
+      onInputChange={setSearchQuery}
+      initialValue={searchQuery}
+      className="w-full"
+    />
+  </div>
+
+  {/* Mobile FilterDropdown (after search & button) */}
+  {showFiltersMobile && (
+    <div className="lg:hidden mb-6">
+      <FilterDropdown
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onApplyFilter={handleApplyFilter}
+              className="lg:sticky lg:top-4"
             />
+          </div>
+  )}
+
+
+
 
             {/* Results Section */}
             <div>
@@ -451,10 +495,11 @@ export default function Home() {
                   ))}
                 </div>
               )}
+       
 
               {/* Papers List */}
               {!loading && (
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-4 sm:space-y-6">     
                   {papers.map((item) => {
                     const paper = item.paper;
                     const reportText = item.reportText || "";

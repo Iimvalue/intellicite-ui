@@ -27,7 +27,7 @@ const Footer = ({
 
           {/* Logo - Moved here */}
           <img
-            src="./public/logo.png"
+            src="/logo.png"
             className="h-10 w-10 rounded-full"
 
             alt="Company Logo" // Always add alt text for accessibility
