@@ -28,7 +28,7 @@ import {
 
 const ProtectedRoute = () => {
   const location = useLocation();
-  const token = getValidToken(); 
+  const token = getValidToken();
 
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
@@ -36,7 +36,6 @@ const ProtectedRoute = () => {
 
   return <Outlet />;
 };
-
 
 function Layout() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!getValidToken());
@@ -54,12 +53,11 @@ function Layout() {
 
   const navigationList = [
     { label: "Home", path: "/" },
-    ...(isLoggedIn ? [{ label: "Search", path: "/search" }] : []),
+    { label: "Search", path: "/search" },
     ...(isLoggedIn ? [{ label: "History", path: "/history" }] : []),
     ...(isLoggedIn ? [{ label: "Bookmarks", path: "/bookmarks" }] : []),
-    { label: "Search", path: "/search" },
-    { label: "Citation Evaluation", path: "/citation" },
    
+    { label: "Citation Evaluation", path: "/citation" },
   ];
 
   const footerNavigation = [
@@ -141,7 +139,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-// مكون رئيسي يحتوي على الرواتر
 export default function Router() {
   return <RouterProvider router={router} />;
 }
