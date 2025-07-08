@@ -23,8 +23,7 @@ import {
   UserManagement,
   Settings,
   AdminProtectedRoute,
-  Settings,
-  AdminProtectedRoute
+
 } from "../admin";
 const ProtectedRoute = () => {
   const location = useLocation();
