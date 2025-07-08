@@ -43,12 +43,12 @@ function Login() {
         severity: "success",
         summary: "Login Successful",
         detail: "You have been logged in successfully!",
-        life: 3000,
+        life: 1000,
       });
 
       setTimeout(() => {
         navigate("/search");
-      }, 3000);
+      }, 1000);
     } catch (error) {
   const backendMsg = error.response?.data?.message;
 

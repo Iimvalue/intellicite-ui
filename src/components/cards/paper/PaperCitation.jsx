@@ -26,6 +26,8 @@ const PaperCitation = ({
 }) => {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Determine badge color based on badge type
   const getBadgeStyle = (badge) => {
     switch (badge) {
       case "Highly Cited":
@@ -48,9 +50,63 @@ const PaperCitation = ({
         };
       case "Top 10% Most Cited":
         return {
-          background: 'rgba(16, 183, 127, 0.15)',
-          text: '#10b77f',
-          border: '#10b77f'
+          background: "rgba(16, 183, 127, 0.15)",
+          text: "#10b77f",
+          border: "#10b77f",
+        };
+      case "High Impact":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "Above Average Impact":
+        return {
+          background: "rgba(59, 130, 246, 0.15)",
+          text: "#3b82f6",
+          border: "#3b82f6",
+        };
+      case "Top Percentile":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "High Percentile":
+        return {
+          background: "rgba(59, 130, 246, 0.15)",
+          text: "#3b82f6",
+          border: "#3b82f6",
+        };
+      case "Low Citation":
+        return {
+          background: "rgba(249, 115, 22, 0.15)",
+          text: "#f97316",
+          border: "#f97316",
+        };
+      case "No Citations":
+        return {
+          background: "rgba(239, 68, 68, 0.15)",
+          text: "#ef4444",
+          border: "#ef4444",
+        };
+      case "Low Impact":
+        return {
+          background: "rgba(249, 115, 22, 0.15)",
+          text: "#f97316",
+          border: "#f97316",
+        };
+      case "Recent":
+        return {
+          background: "rgba(168, 85, 247, 0.15)",
+          text: "#a855f7",
+          border: "#a855f7",
+        };
+      case "Outdated":
+        return {
+          background: "rgba(107, 114, 128, 0.15)",
+          text: "#6b7280",
+          border: "#6b7280",
         };
       case "Open Access":
         return {
@@ -58,7 +114,61 @@ const PaperCitation = ({
           text: "#3b82f6",
           border: "#3b82f6",
         };
-      case "Recent":
+      case "Full Text Available":
+        return {
+          background: "rgba(14, 165, 233, 0.15)",
+          text: "#0ea5e9",
+          border: "#0ea5e9",
+        };
+      case "Retracted":
+        return {
+          background: "rgba(239, 68, 68, 0.15)",
+          text: "#ef4444",
+          border: "#ef4444",
+        };
+      case "MeSH Indexed":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "Preprint":
+        return {
+          background: "rgba(245, 158, 11, 0.15)",
+          text: "#f59e0b",
+          border: "#f59e0b",
+        };
+      case "Pre-Review":
+        return {
+          background: "rgba(245, 158, 11, 0.15)",
+          text: "#f59e0b",
+          border: "#f59e0b",
+        };
+      case "Peer Reviewed":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "High Impact Journal":
+        return {
+          background: "rgba(217, 119, 6, 0.15)",
+          text: "#d97706",
+          border: "#d97706",
+        };
+      case "Medium Impact Journal":
+        return {
+          background: "rgba(59, 130, 246, 0.15)",
+          text: "#3b82f6",
+          border: "#3b82f6",
+        };
+      case "International Collaboration":
+        return {
+          background: "rgba(147, 51, 234, 0.15)",
+          text: "#9333ea",
+          border: "#9333ea",
+        };
+      case "Large Collaboration":
         return {
           background: "rgba(168, 85, 247, 0.15)",
           text: "#a855f7",
@@ -76,8 +186,75 @@ const PaperCitation = ({
           text: "#6b7280",
           border: "#6b7280",
         };
+      case "Multi-Funded":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "Grant Funded":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "Funded Research":
+        return {
+          background: "rgba(59, 130, 246, 0.15)",
+          text: "#3b82f6",
+          border: "#3b82f6",
+        };
+      case "Highly Focused":
+        return {
+          background: "rgba(99, 102, 241, 0.15)",
+          text: "#6366f1",
+          border: "#6366f1",
+        };
+      case "Interdisciplinary":
+        return {
+          background: "rgba(139, 92, 246, 0.15)",
+          text: "#8b5cf6",
+          border: "#8b5cf6",
+        };
+      case "Spanish Language":
+      case "French Language":
+      case "German Language":
+      case "Chinese Language":
+      case "Japanese Language":
+      case "Portuguese Language":
+      case "Russian Language":
+      case "Italian Language":
+      case "Korean Language":
+      case "Arabic Language":
+      case "Non-English":
+        return {
+          background: "rgba(20, 184, 166, 0.15)",
+          text: "#14b8a6",
+          border: "#14b8a6",
+        };
+      case "Book":
+      case "Book Chapter":
+      case "Dataset":
+      case "Dissertation":
+      case "Editorial":
+      case "Letter":
+      case "Review Article":
+      case "Report":
+      case "Conference Paper":
+      case "Special Publication":
+        return {
+          background: "rgba(100, 116, 139, 0.15)",
+          text: "#64748b",
+          border: "#64748b",
+        };
+      case "Invalid Date":
+        return {
+          background: "rgba(239, 68, 68, 0.15)",
+          text: "#ef4444",
+          border: "#ef4444",
+        };
       default:
-        if (badge.includes('Research')) {
+        if (badge.includes("Research")) {
           return {
             background: "rgba(99, 102, 241, 0.15)",
             text: "#6366f1",
@@ -101,23 +278,37 @@ const PaperCitation = ({
   const formatCitations = (count) =>
     count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
 
-  const handleSave = async () => {
+  const handleSavePaper = async () => {
     if (isLoading) return;
+    
     setIsLoading(true);
-    try {
-      await onSavePaper?.();
-      setIsSaved((prev) => !prev);
-    } catch (e) {
-      console.error(e);
+    
+    if (onSavePaper) {
+      try {
+        await onSavePaper();
+        setIsSaved(prev => !prev);
+      } catch (error) {
+        console.error('Error saving paper:', error);
+      }
+    } else {
+      setIsSaved(prev => !prev);
     }
+    
     setIsLoading(false);
   };
-
-  const handleView = () => {
-    const isPdf = viewPaperLink?.toLowerCase().includes(".pdf");
-    if (isPdf && onViewPdf) return onViewPdf(viewPaperLink, title);
-    if (viewPaperLink && onViewPaper) return onViewPaper(viewPaperLink);
-    if (viewPaperLink) window.open(viewPaperLink, "_blank");
+  
+  const handleViewPaper = () => {
+    const isPdfLink = viewPaperLink && viewPaperLink.toLowerCase().includes('.pdf');
+    
+    if (isPdfLink && onViewPdf) {
+      onViewPdf(viewPaperLink, title);
+    } else if (viewPaperLink && onViewPaper) {
+      onViewPaper(viewPaperLink);
+    } else if (viewPaperLink) {
+      window.open(viewPaperLink, '_blank');
+    } else if (onViewPaper) {
+      onViewPaper(null);
+    }
   };
 
   return (
@@ -184,7 +375,7 @@ const PaperCitation = ({
             {/* Action Buttons */}
             <div className="flex flex-row sm:justify-end items-center gap-3 w-full">
               <Button
-                onClick={handleView}
+                onClick={handleViewPaper}
                 className={`w-2/3 sm:w-auto transition-all duration-200 font-medium ${
                   viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf")
                     ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
@@ -225,7 +416,7 @@ const PaperCitation = ({
               </Button>
 
               <button
-                onClick={handleSave}
+                onClick={handleSavePaper}
                 disabled={isLoading}
                 className={`w-full sm:w-auto p-2 rounded-full transition ${
                   isSaved

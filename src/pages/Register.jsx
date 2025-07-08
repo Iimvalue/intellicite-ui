@@ -57,11 +57,11 @@ function Register() {
     severity: "success",
     summary: "Welcome!",
     detail: "You're now signed up! Redirecting...",
-    life: 3000,
+    life: 1000,
   });
       setTimeout(() => {
         navigate("/search");
-      }, 3000);
+      }, 1000);
     } catch (error) {
   const backendMsg = error.response?.data?.message;
 
