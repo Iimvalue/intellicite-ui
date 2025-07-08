@@ -9,7 +9,7 @@ import {
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { confirmDialog } from "primereact/confirmdialog";
-import { Palette, User, LogOut } from "lucide-react";
+import { Eye, EyeOff, User, LogIn, LogOut } from "lucide-react";
 
 const Header = ({ logo, navigationItems = [] }) => {
   const navigate = useNavigate();
@@ -129,10 +129,10 @@ const Header = ({ logo, navigationItems = [] }) => {
       <Toast ref={toast} position="top-right" />
       <ConfirmDialog />
 
-      <header className="w-full bg-white  fixed top-0 left-0 z-50">
+      <header className="w-full bg-white fixed top-0 left-0 z-50">
         <div className="sm:px-7">
           {/* Font Controls */}
-          <div className="flex justify-between items-center py-1 border-b border-gray-200 text-sm px-4">
+          <div className="flex justify-between items-center lg:pt-1 border-b border-gray-200 text-sm px-4">
             <div className="text-gray-600">{currentDate}</div>
 
             <div className="flex items-center space-x-2">
@@ -160,17 +160,15 @@ const Header = ({ logo, navigationItems = [] }) => {
               >
                 {colorBlindMode ? (
                   <>
-                    <Palette className="h-5 w-5" />
-
-                    <span className="ml-1 text-[10px] text-gray-700 hidden sm:inline hover:cursor-pointer">
+                    <EyeOff className="h-5 w-5 text-yellow-700 hover:cursor-pointer" />
+                    <span className="ml-1 text-[10px] text-yellow-800 hidden sm:inline hover:cursor-pointer">
                       Color Blind
                     </span>
                   </>
                 ) : (
                   <>
-                    <Palette className="h-5 w-5 text-blue-800" />
-
-                    <span className="ml-1 text-[10px] text-gray-700 hidden sm:inline  hover:cursor-pointer">
+                    <Eye className="h-5 w-5 text-blue-800 hover:cursor-pointer" />
+                    <span className="ml-1 text-[10px] text-gray-700 hidden sm:inline hover:cursor-pointer">
                       Normal
                     </span>
                   </>
@@ -209,17 +207,17 @@ const Header = ({ logo, navigationItems = [] }) => {
                   <Link
                     key={index}
                     to={item.path}
-                    className={`text-sm font-medium py-2 px-3 rounded-lg transition-all ${
+                    className={`text-sm font-medium py-2 px-3 rounded-lg transition-all flex items-center ${
                       location.pathname === item.path
                         ? "text-blue-900 bg-blue-100"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
+                    {item.icon}
                     {item.label}
                   </Link>
                 ))}
               </nav>
-
               {/* Right Section */}
               <div className="flex items-center space-x-4">
                 {isLoggedIn ? (
@@ -256,10 +254,14 @@ const Header = ({ logo, navigationItems = [] }) => {
                     )}
                   </div>
                 ) : (
-                  <Button
+                  <Button 
                     onClick={handleSignIn}
-                    className="text-sm font-medium py-2 bg-[#1341F8] hover:bg-[#1e3b8a] text-white"
+                    className="hidden lg:flex items-center space-x-2 text-sm font-medium py-2 px-4 bg-[#1341F8] hover:bg-[#1e3b8a] text-white rounded-md hover:cursor-pointer"
+
                   >
+                    {" "}
+
+                    <LogIn className="h-4 w-4 " />
                     Sign In
                   </Button>
                 )}
@@ -303,12 +305,13 @@ const Header = ({ logo, navigationItems = [] }) => {
                     key={index}
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block text-sm font-medium px-4 py-2 rounded ${
+                    className={`flex items-center text-sm font-medium px-4 py-2 rounded ${
                       location.pathname === item.path
                         ? "text-blue-900 bg-blue-100"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
+                    {item.icon}
                     {item.label}
                   </Link>
                 ))}
@@ -345,15 +348,18 @@ const Header = ({ logo, navigationItems = [] }) => {
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={() => {
-                        handleSignIn();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100 text-gray-700"
-                    >
-                      Sign In / Sign Up
-                    </button>
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => {
+                          handleSignIn();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="flex items-center px-4 py-2 text-sm text-white bg-[#1341F8] hover:bg-[#1e3b8a] rounded-md space-x-2"
+                      >
+                        <LogIn className="h-4 w-4" />
+                        <span>Sign In</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

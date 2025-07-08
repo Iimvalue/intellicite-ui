@@ -1,3 +1,4 @@
+// Router.jsx
 import React, { useEffect, useState } from "react";
 import {
   createBrowserRouter,
@@ -5,6 +6,7 @@ import {
   Outlet,
   Navigate,
   useLocation,
+  Link,
 } from "react-router-dom";
 
 import Header from "../components/header/Header";
@@ -26,6 +28,18 @@ import {
   AdminProtectedRoute,
 } from "../admin";
 
+import {
+  Home as HomeIcon,
+  Search as SearchIcon,
+  Clock as ClockIcon,
+  Bookmark as BookmarkIcon,
+  FileText as FileTextIcon,
+  Info as InfoIcon,
+  Mail as MailIcon,
+  File as FileIcon,
+  Shield as ShieldIcon,
+} from "lucide-react";
+
 const ProtectedRoute = () => {
   const location = useLocation();
   const token = getValidToken();
@@ -38,7 +52,9 @@ const ProtectedRoute = () => {
 };
 
 function Layout() {
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(!!getValidToken());
+
   useEffect(() => {
     const handleAuthChange = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
@@ -52,19 +68,62 @@ function Layout() {
   }, []);
 
   const navigationList = [
-    { label: "Home", path: "/" },
-    { label: "Search", path: "/search" },
-    ...(isLoggedIn ? [{ label: "History", path: "/history" }] : []),
-    ...(isLoggedIn ? [{ label: "Bookmarks", path: "/bookmarks" }] : []),
-   
-    { label: "Citation Evaluation", path: "/citation" },
+    {
+      label: "Home",
+      path: "/",
+      icon: <HomeIcon className="inline-block w-5 h-5 mr-1" />,
+    },
+    {
+      label: "Search",
+      path: "/search",
+      icon: <SearchIcon className="inline-block w-5 h-5 mr-1" />,
+    },
+    ...(isLoggedIn
+      ? [
+          {
+            label: "History",
+            path: "/history",
+            icon: <ClockIcon className="inline-block w-5 h-5 mr-1" />,
+          },
+        ]
+      : []),
+    ...(isLoggedIn
+      ? [
+          {
+            label: "Bookmarks",
+            path: "/bookmarks",
+            icon: <BookmarkIcon className="inline-block w-5 h-5 mr-1" />,
+          },
+        ]
+      : []),
+    {
+      label: "Citation Evaluation",
+      path: "/citation",
+      icon: <FileTextIcon className="inline-block w-5 h-5 mr-1" />,
+    },
   ];
 
   const footerNavigation = [
-    { label: "About", path: "/about" },
-    { label: "Contact", path: "/contact" },
-    { label: "Terms of Service", path: "/terms" },
-    { label: "Privacy Policy", path: "/privacy" },
+    {
+      label: "About",
+      path: "/about",
+      icon: <InfoIcon className="inline-block w-5 h-5 mr-1" />,
+    },
+    {
+      label: "Contact",
+      path: "/contact",
+      icon: <MailIcon className="inline-block w-5 h-5 mr-1" />,
+    },
+    {
+      label: "Terms of Service",
+      path: "/terms",
+      icon: <FileIcon className="inline-block w-5 h-5 mr-1" />,
+    },
+    {
+      label: "Privacy Policy",
+      path: "/privacy",
+      icon: <ShieldIcon className="inline-block w-5 h-5 mr-1" />,
+    },
   ];
 
   return (
