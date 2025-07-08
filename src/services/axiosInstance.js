@@ -4,7 +4,7 @@ import { getValidToken, isTokenExpired } from "./tokenService";
 
 // Create axios instance with base URL and timeout
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:3000",  // Base URL from environment variable
+  baseURL: import.meta.env.VITE_BASE_URL || "https://intellicite-api.onrender.com",  // Base URL from environment variable
   timeout: 30000,  // 30 seconds timeout for requests
   headers: {
     "Content-Type": "application/json",  // Default headers for JSON requests
