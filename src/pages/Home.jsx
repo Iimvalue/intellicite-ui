@@ -72,7 +72,28 @@ export default function Home() {
       console.log("Home state saved to localStorage");
     }
   }, [papers, allPapers, searchQuery, filters]);
+  const handleCopyDOI = (doi) => {
+    if (!doi) return;
 
+    navigator.clipboard
+      .writeText(doi)
+      .then(() => {
+        toast.current.show({
+          severity: "success",
+          summary: "Copied",
+          detail: "DOI copied to clipboard",
+          life: 3000,
+        });
+      })
+      .catch(() => {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to copy DOI",
+          life: 3000,
+        });
+      });
+  };
   // Load persisted state from localStorage
   const loadPersistedState = () => {
     try {
@@ -402,6 +423,18 @@ export default function Home() {
     // This function can be removed as we're using the comprehensive filter
   };
 
+  // const handleCopyDOI = (doi) => {
+  //   if (!doi) return;
+
+  //   navigator.clipboard
+  //     .writeText(doi)
+  //     .then(() => {
+  //       alert("DOI copied to clipboard!");
+  //     })
+  //     .catch(() => {
+  //       alert("Failed to copy DOI.");
+  //     });
+  // };
   return (
     <div className="min-h-screen bg-gray-50 pt-20 lg:px-20">
       {/* Main Content */}
@@ -520,6 +553,8 @@ export default function Home() {
                         onViewPaper={(link) => handleViewPaper(paper._id, link)}
                         onViewPdf={handleViewPdf}
                         className="w-full"
+                        handleCopyDOI={handleCopyDOI}
+                        doi={paper.doi || ""}
                       />
                     );
                   })}
@@ -579,8 +614,6 @@ export default function Home() {
                   </p>
                 </div>
               )}
-
-            
             </div>
           </div>
         </div>
