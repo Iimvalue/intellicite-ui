@@ -36,7 +36,7 @@ const ProtectedRoute = () => {
 };
 
 const navigationList = [
-  { label: "Home", path: "/landing" },
+  { label: "Home", path: "/" },
   { label: "Search", path: "/search" },
   { label: "History", path: "/history" },
   { label: "Bookmarks", path: "/bookmarks" },
@@ -86,7 +86,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "landing",
+        path: "/",
         element: <LandingPage />,
       },
     ],
