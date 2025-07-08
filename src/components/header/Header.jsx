@@ -9,6 +9,7 @@ import {
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { confirmDialog } from "primereact/confirmdialog";
+import { Palette, User, LogOut } from "lucide-react";
 
 const Header = ({ logo, navigationItems = [] }) => {
   const navigate = useNavigate();
@@ -21,6 +22,17 @@ const Header = ({ logo, navigationItems = [] }) => {
   const [userInitial, setUserInitial] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
+  const [colorBlindMode, setColorBlindMode] = useState(() => {
+    return localStorage.getItem("colorBlindMode") === "true";
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "color-blind-deuteranopia",
+      colorBlindMode
+    );
+    localStorage.setItem("colorBlindMode", colorBlindMode);
+  }, [colorBlindMode]);
   useEffect(() => {
     const checkAuth = async () => {
       const auth = await isAuthenticated();
@@ -121,12 +133,12 @@ const Header = ({ logo, navigationItems = [] }) => {
         <div className="sm:px-7">
           {/* Font Controls */}
           <div className="flex justify-between items-center py-1 border-b border-gray-200 text-sm px-4">
-
             <div className="text-gray-600">{currentDate}</div>
 
-
             <div className="flex items-center space-x-2">
-              <span className="text-gray-700 font-medium">Font Size:</span>
+              <span className="text-gray-700 font-medium text-xs sm:text-sm">
+                Font Size:
+              </span>
               <button
                 onClick={increaseFont}
                 className="text-[18px] px-2 text-blue-800 hover:text-blue-900 font-bold hover:cursor-pointer hover:bg-gray-200 rounded-2xl"
@@ -138,6 +150,31 @@ const Header = ({ logo, navigationItems = [] }) => {
                 className="px-1 text-blue-800 hover:text-blue-900 font-bold hover:cursor-pointer hover:bg-gray-200 rounded-2xl"
               >
                 A−
+              </button>
+
+              {/* Color Blind Toggle */}
+              <button
+                onClick={() => setColorBlindMode(!colorBlindMode)}
+                className={`ml-4 p-2 rounded-full hover:bg-gray-200 transition flex items-center`}
+                title="Color Blind Mode"
+              >
+                {colorBlindMode ? (
+                  <>
+                    <Palette className="h-5 w-5" />
+
+                    <span className="ml-1 text-[10px] text-gray-700 hidden sm:inline hover:cursor-pointer">
+                      Color Blind
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Palette className="h-5 w-5 text-blue-800" />
+
+                    <span className="ml-1 text-[10px] text-gray-700 hidden sm:inline  hover:cursor-pointer">
+                      Normal
+                    </span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -196,22 +233,24 @@ const Header = ({ logo, navigationItems = [] }) => {
                     {dropdownOpen && (
                       <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 z-50">
                         <button
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center space-x-2"
                           onClick={() => {
                             setDropdownOpen(false);
                             navigate("/profile");
                           }}
                         >
-                          Profile
+                          <User className="h-5 w-5 text-gray-600" />
+                          <span>Profile</span>
                         </button>
                         <button
-                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center space-x-2"
                           onClick={() => {
                             setDropdownOpen(false);
                             handleLogout();
                           }}
                         >
-                          Logout
+                          <LogOut className="h-5 w-5" />
+                          <span>Logout</span>
                         </button>
                       </div>
                     )}
@@ -289,18 +328,20 @@ const Header = ({ logo, navigationItems = [] }) => {
                           navigate("/profile");
                           setIsMobileMenuOpen(false);
                         }}
-                        className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100"
+                        className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
                       >
-                        Profile
+                        <User className="h-5 w-5 text-gray-600" />
+                        <span>Profile</span>
                       </button>
                       <button
                         onClick={() => {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="block w-full text-left text-sm px-4 py-2 text-red-600 hover:bg-gray-100"
+                        className="block w-full text-left text-sm px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center space-x-2"
                       >
-                        Logout
+                        <LogOut className="h-5 w-5" />
+                        <span>Logout</span>
                       </button>
                     </>
                   ) : (
