@@ -188,12 +188,12 @@ const FilterDropdown = ({
       <div className="pt-4 border-t border-gray-100">
         <Button
           onClick={handleApplyFilter}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 transition-colors duration-200"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 transition-colors duration-200 hover:cursor-pointer"
         >
-          <Filter className="h-4 w-4 mr-2" />
+          <Filter className="h-4 w-4 mr-2 " />
           Apply Filters
           {hasActiveFilters && (
-            <span className="ml-2 px-2 py-0.5 text-xs bg-blue-500 rounded-full">
+            <span className="ml-2 px-2 py-0.5 text-xs bg-blue-500 rounded-full ">
               {Object.values(filters).filter(value => value !== '').length}
             </span>
           )}
