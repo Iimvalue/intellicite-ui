@@ -17,6 +17,7 @@ import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Citation from "../pages/Citation";
 import LandingPage from "../pages/LandingPage";
+import { getValidToken } from "../services/tokenService";
 
 import {
   Dashboard,
@@ -27,7 +28,7 @@ import {
 
 const ProtectedRoute = () => {
   const location = useLocation();
-  const token = localStorage.getItem("token");
+  const token = getValidToken(); 
 
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
@@ -36,9 +37,9 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-function Layout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
+function Layout() {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getValidToken());
   useEffect(() => {
     const handleAuthChange = () => {
       setIsLoggedIn(!!localStorage.getItem("token"));
