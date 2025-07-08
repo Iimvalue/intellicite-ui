@@ -67,7 +67,7 @@ Backend API: https://intellicite-api.onrender.com
 
 ```bash
 # استنساخ المشروع
-git clone [repository-url]
+git clone https://github.com/Iimvalue/intellicite-api.git
 
 # الانتقال إلى مجلد المشروع
 cd intellicite
