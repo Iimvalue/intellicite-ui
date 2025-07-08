@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import PdfModal from "../components/modal/Modal";
 import PaperCitation from "../components/cards/paper/PaperCitation";
 import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
+import axiosInstance from "../services/axiosInstance";
 
 function Citation() {
   const [doi, setDoi] = useState("");
@@ -23,21 +24,14 @@ function Citation() {
     setPaper(null);
 
     try {
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        `http://localhost:3000/api/papers/citeCheck`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ doi, query }),
-        }
-      );
+      const response = await axiosInstance.post(`/api/papers/citeCheck`, {
+        doi,
+        query,
+      });
 
-      const data = await response.json();
+      const data = response.data;
       if (data.success) {
         setPaper({
           ...data.data.paperId,
@@ -46,13 +40,13 @@ function Citation() {
       } else {
         setError("Citation check failed");
       }
-    } catch (err) {
+        } catch (err) {
       console.error("Evaluation error:", err);
       setError("Server error during evaluation");
-    } finally {
+        } finally {
       setLoading(false);
-    }
-  };
+        }
+      };
 
   const handleViewPdf = (pdfUrl, title) => {
     setPdfModal({ isOpen: true, pdfUrl, title });
@@ -78,8 +72,8 @@ function Citation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+<div className="min-h-screen bg-gray-50 pt-20">    {/* Main Content */}
+<div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Title & Intro */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -105,7 +99,7 @@ function Citation() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Research Topic"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white "
               />
             </div>
 
@@ -119,7 +113,7 @@ function Citation() {
                 value={doi}
                 onChange={(e) => setDoi(e.target.value)}
                 placeholder="e.g 10.1000/xyz123"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white "
               />
             </div>
 
@@ -136,7 +130,7 @@ function Citation() {
             {error && <p className="text-red-600 text-sm pt-2">{error}</p>}
           </div>
           {/* Right - Result */}
-          <div className="flex-1">
+          <div className="flex-3/3 ">
             {loading && <PaperSkeletonCard className="w-full" />}
 
             {!loading && paper && (
@@ -165,7 +159,6 @@ function Citation() {
           </div>
         </div>
       </div>
-
       {/* PDF Modal */}
       <PdfModal
         isOpen={pdfModal.isOpen}

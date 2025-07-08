@@ -2,112 +2,98 @@ import FilterDropdown from "../components/filter-dropdown/FilterDropdown";
 import { useState, useEffect } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PaperCard from "../components/cards/paper/PaperCard";
-import Footer from "../components/footer/Footer";
+import PdfModal from "../components/modal/Modal";
+import axiosInstance from "../services/axiosInstance";
 
 export default function Save() {
   const [searchQuery, setSearchQuery] = useState("");
   const [papers, setPapers] = useState([]);
   const [allPapers, setAllPapers] = useState([]); // Store original unfiltered results
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     dateRange: 'any',
     paperType: 'all',
     citationRange: 'any',
     accessType: 'all'
   });
+  const [pdfModal, setPdfModal] = useState({
+    isOpen: false,
+    pdfUrl: '',
+    title: ''
+  });
 
-  const footerNavigation = [
-    { label: "About", path: "/about" },
-    { label: "Contact", path: "/contact" },
-    { label: "Terms of Service", path: "/terms" },
-    { label: "Privacy Policy", path: "/privacy" },
-  ];
-
-  // Mock data for saved papers - all should be marked as saved (initialSaved: true)
-  const savedPapers = [
-    {
-      id: 1,
-      paper: {
-        _id: "1",
-        badges: ["Highly Cited", "Open Access"],
-        title: "Deep Learning for Image Recognition: Advanced Neural Network Architectures",
-        authors: ["Dr. Sarah Johnson", "Michael Chen", "Dr. Emily Rodriguez"],
-        journal: "Nature Machine Intelligence",
-        publicationDate: "2023-11-15T00:00:00.000Z",
-        citationCount: 1823,
-        pdfLink: "https://example.com/papers/deep-learning-image.pdf",
-        sourceLink: "https://example.com/papers/deep-learning-image.pdf"
-      },
-      reportText: "A comprehensive study on the application of deep learning techniques in image recognition, exploring various neural network architectures and their performance on benchmark datasets. Includes analysis of CNNs, ResNets, and Vision Transformers."
-    },
-    {
-      id: 2,
-      paper: {
-        _id: "2",
-        badges: ["Recent", "Highly Cited"],
-        title: "Reinforcement Learning for Autonomous Robotics Systems",
-        authors: ["Dr. James Wilson", "Alice Kumar"],
-        journal: "IEEE Transactions on Robotics",
-        publicationDate: "2024-02-10T00:00:00.000Z",
-        citationCount: 756,
-        pdfLink: "",
-        sourceLink: "https://doi.org/10.1109/example.2024.robotics"
-      },
-      reportText: "An investigation into the use of reinforcement learning algorithms for controlling autonomous robotic systems, focusing on applications in navigation, manipulation, and human-robot interaction in complex environments."
-    },
-    {
-      id: 3,
-      paper: {
-        _id: "3",
-        badges: ["Open Access"],
-        title: "Natural Language Processing with Large Language Models",
-        authors: ["Dr. Maria Garcia", "John Park", "Lisa Zhang", "Professor Robert Anderson"],
-        journal: "Computational Linguistics",
-        publicationDate: "2023-09-22T00:00:00.000Z",
-        citationCount: 2187,
-        pdfLink: "https://example.com/papers/nlp-llm.pdf",
-        sourceLink: "https://example.com/papers/nlp-llm.pdf"
-      },
-      reportText: "An in-depth analysis of transformer models and their impact on natural language processing tasks, including machine translation, text summarization, and conversational AI. Comprehensive evaluation of model performance and efficiency."
-    },
-    {
-      id: 4,
-      paper: {
-        _id: "4",
-        badges: ["Highly Cited"],
-        title: "Quantum Computing Applications in Cryptography and Security",
-        authors: ["Professor Anna Kowalski", "David Kim", "Dr. Rachel Turner"],
-        journal: "Physical Review Applied",
-        publicationDate: "2023-07-08T00:00:00.000Z",
-        citationCount: 1456,
-        pdfLink: "https://example.com/papers/quantum-crypto.pdf",
-        sourceLink: "https://example.com/papers/quantum-crypto.pdf"
-      },
-      reportText: "Exploring the revolutionary impact of quantum computing on modern cryptographic systems and cybersecurity. This research examines quantum algorithms, post-quantum cryptography, and secure communication protocols."
-    },
-    {
-      id: 5,
-      paper: {
-        _id: "5",
-        badges: ["Recent", "Open Access"],
-        title: "Sustainable Energy Storage: Next-Generation Battery Technologies",
-        authors: ["Dr. Jennifer Lee", "Mohamed Hassan", "Professor Lisa Wang"],
-        journal: "Nature Energy",
-        publicationDate: "2024-01-30T00:00:00.000Z",
-        citationCount: 634,
-        pdfLink: "https://example.com/papers/battery-tech.pdf",
-        sourceLink: "https://example.com/papers/battery-tech.pdf"
-      },
-      reportText: "Comprehensive analysis of emerging battery technologies for sustainable energy storage, including solid-state batteries, lithium-metal batteries, and novel electrode materials for grid-scale applications."
+  // Function to transform backend response to component format
+  const transformSavedData = (apiResponse) => {
+    if (!apiResponse.data || !Array.isArray(apiResponse.data)) {
+      return [];
     }
-  ];
+
+    return apiResponse.data.map((savedItem, index) => ({
+      id: savedItem._id, // Use the saved paper ID
+      paper: {
+        _id: savedItem.paperId._id,
+        badges: savedItem.paperId.badges || [],
+        title: savedItem.paperId.title,
+        authors: savedItem.paperId.authors || [],
+        journal: savedItem.paperId.journal,
+        publicationDate: savedItem.paperId.publicationDate,
+        citationCount: savedItem.paperId.citationCount || 0,
+        pdfLink: savedItem.paperId.pdfLink || "",
+        sourceLink: savedItem.paperId.sourceLink,
+        doi: savedItem.paperId.doi,
+        isOpenAccess: savedItem.paperId.isOpenAccess
+      },
+      reportText: savedItem.personalNotes || "", // Use personal notes as description
+      savedAt: savedItem.createdAt, // When it was saved
+      savedId: savedItem._id // Keep track of the saved record ID for unsaving
+    }));
+  };
+
+  // Fetch saved papers from backend
+  const fetchSavedPapers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await axiosInstance.get('api/bookmarks/');
+
+      if (response.data.success) {
+        console.log("API Response:", response.data);
+        const transformedData = transformSavedData(response.data);
+        setAllPapers(transformedData);
+        setPapers(transformedData);
+      } else {
+        setError(response.data.message || "Failed to fetch saved papers");
+      }
+    } catch (error) {
+      console.error("Error fetching saved papers:", error);
+      setError("Network error occurred while fetching saved papers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Initialize papers on component mount
   useEffect(() => {
-    setAllPapers(savedPapers);
-    setPapers(savedPapers);
+    fetchSavedPapers();
   }, []);
 
-  // Filter function (same as Home page)
+  // Watch for searchQuery changes to handle clearing
+  useEffect(() => {
+    if (searchQuery === "" && allPapers.length > 0) {
+      console.log("Search query is empty, showing all saved papers:", allPapers.length);
+      setFilters({
+        dateRange: "any",
+        paperType: "all",
+        citationRange: "any",
+        accessType: "all",
+      });
+      setPapers(allPapers);
+    }
+  }, [searchQuery, allPapers]);
+
+  // Filter function (same as other pages)
   const applyFilters = (filterCriteria) => {
     let filteredPapers = [...allPapers];
 
@@ -178,22 +164,24 @@ export default function Save() {
     applyFilters(filterCriteria);
   };
 
-  // Function to get description - use reportText as-is or fallback
-  const getDescription = (reportText, paper) => {
+  // Function to get description - use personal notes or fallback
+  const getDescription = (reportText, paper, savedAt) => {
     if (reportText && reportText.trim() !== "") {
-      return reportText; // Return exactly as received from API
+      return reportText; // Return personal notes if available
     }
     
-    // Fallback to journal and publication info only if no reportText
+    // Enhanced fallback with saved date
     const year = new Date(paper.publicationDate).getFullYear();
-    return `Published in ${paper.journal} (${year})`;
+    const savedDate = new Date(savedAt).toLocaleDateString();
+    return `Published in ${paper.journal} (${year}) - Saved on ${savedDate}`;
   };
 
   const handleSearch = (query) => {
     console.log("Searching saved papers for:", query);
     setSearchQuery(query);
-    // Implement search logic for saved papers
-    if (query.trim()) {
+    
+    if (query && query.trim() !== "") {
+      // If there's a search query, filter the results
       const searchResults = allPapers.filter(item => 
         item.paper.title.toLowerCase().includes(query.toLowerCase()) ||
         item.paper.authors.some(author => author.toLowerCase().includes(query.toLowerCase())) ||
@@ -201,32 +189,55 @@ export default function Save() {
       );
       setPapers(searchResults);
     } else {
-      // Reset filters when search is cleared
-      setFilters({ dateRange: 'any', paperType: 'all', citationRange: 'any', accessType: 'all' });
+      // If search is empty or cleared, show ALL results and reset filters
+      console.log("Search cleared, showing all saved papers:", allPapers.length);
+      setFilters({ 
+        dateRange: 'any', 
+        paperType: 'all', 
+        citationRange: 'any', 
+        accessType: 'all' 
+      });
       setPapers(allPapers);
     }
   };
 
+  // Updated unsave function to make API call
   const handleUnsavePaper = async (paperId) => {
     console.log("Removing paper from saved:", paperId);
-    // Implement unsave logic - remove from bookmarks
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    try {
+      const response = await axiosInstance.delete(`api/bookmarks/${paperId}`);
+
+      if (response.status === 200) {
+        // Remove from local state immediately for better UX
+        const updatedAllPapers = allPapers.filter(p => p.paper._id !== paperId);
+        const updatedPapers = papers.filter(p => p.paper._id !== paperId);
+        setAllPapers(updatedAllPapers);
+        setPapers(updatedPapers);
+        
+        console.log("Paper unsaved successfully");
+        return { success: true, message: "Paper removed from saved list" };
+      } else {
+        console.error("Failed to unsave paper:", response.status);
+        return { success: false, message: "Failed to remove paper" };
+      }
+    } catch (error) {
+      console.error("Error unsaving paper:", error);
+      return { success: false, message: "Network error occurred" };
+    }
   };
 
   const handleViewPaper = (paperId, link) => {
     console.log('Viewing saved paper:', paperId, 'Link:', link);
     
     if (link && link.trim() !== "") {
-      // Open the provided link (non-PDF links)
       window.open(link, '_blank');
     } else {
-      // Fallback: try to find the paper and use sourceLink
       const paperItem = papers.find(p => p.paper._id === paperId);
       if (paperItem?.paper.sourceLink) {
         console.log('Using sourceLink as fallback:', paperItem.paper.sourceLink);
         window.open(paperItem.paper.sourceLink, '_blank');
       } else if (paperItem?.paper.doi) {
-        // Last resort: create DOI link
         const doiLink = `https://doi.org/${paperItem.paper.doi}`;
         console.log('Using DOI link as fallback:', doiLink);
         window.open(doiLink, '_blank');
@@ -238,12 +249,93 @@ export default function Save() {
 
   const handleViewPdf = (pdfUrl, title) => {
     console.log('Opening PDF modal for saved paper:', pdfUrl, title);
-    // Implement PDF modal logic if needed
+    setPdfModal({
+      isOpen: true,
+      pdfUrl: pdfUrl,
+      title: title
+    });
   };
 
+  const handleClosePdfModal = () => {
+    setPdfModal({
+      isOpen: false,
+      pdfUrl: '',
+      title: ''
+    });
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+            {/* Left Sidebar - Filter Panel */}
+            <div className="w-full lg:w-80 lg:flex-shrink-0 order-2 lg:order-1">
+              <FilterDropdown
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onApplyFilter={handleApplyFilter}
+                className="lg:sticky lg:top-4"
+              />
+            </div>
+
+            {/* Right Content Area */}
+            <div className="flex-1 space-y-6 sm:space-y-8 order-1 lg:order-2">
+              {/* Search Bar */}
+              <SearchBar
+                placeholder="Search Your Saved Papers"
+                onSearch={handleSearch}
+                onInputChange={setSearchQuery}
+                initialValue={searchQuery}
+                className="w-full"
+              />
+
+              {/* Results Section */}
+              <div>
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                    Saved Papers
+                  </h2>
+                </div>
+                
+                {/* Loading Skeletons */}
+                <div className="space-y-4 sm:space-y-6">
+                  {[1, 2, 3].map((index) => (
+                    <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 rounded mb-3 w-3/4"></div>
+                          <div className="h-4 bg-gray-200 rounded mb-2 w-1/2"></div>
+                          <div className="h-4 bg-gray-200 rounded mb-4 w-2/3"></div>
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                          </div>
+                          <div className="flex space-x-2 mt-4">
+                            <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                            <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-2">
+                          <div className="h-8 bg-gray-200 rounded w-24"></div>
+                          <div className="h-8 bg-gray-200 rounded w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
+<div className="min-h-screen bg-gray-50 pt-20">    {/* Main Content */}
+{/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Sidebar - Filter Panel */}
@@ -280,19 +372,26 @@ export default function Save() {
                 </h2>
               </div>
 
+              {/* Error State */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="text-red-800 text-sm">{error}</div>
+                </div>
+              )}
+
               {/* Papers List */}
               <div className="space-y-4 sm:space-y-6">
                 {papers.map((item) => {
                   const paper = item.paper;
                   const reportText = item.reportText || '';
-                  const description = getDescription(reportText, paper);
+                  const description = getDescription(reportText, paper, item.savedAt);
                   const viewLink = paper.pdfLink && paper.pdfLink.trim() !== "" 
                     ? paper.pdfLink 
                     : paper.sourceLink;
                   
                   return (
                     <PaperCard
-                      key={paper._id}
+                      key={item.id}
                       badges={paper.badges || []}
                       title={paper.title}
                       description={description}
@@ -312,7 +411,7 @@ export default function Save() {
               </div>
 
               {/* Empty State - Search Results */}
-              {papers.length === 0 && searchQuery && (
+              {papers.length === 0 && searchQuery && !loading && (
                 <div className="text-center py-12">
                   <div className="text-gray-400 mb-4">
                     <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,7 +424,7 @@ export default function Save() {
               )}
 
               {/* Initial Empty State */}
-              {papers.length === 0 && !searchQuery && (
+              {papers.length === 0 && !searchQuery && !loading && (
                 <div className="text-center py-12">
                   <div className="text-gray-400 mb-4">
                     <svg
@@ -407,7 +506,13 @@ export default function Save() {
         </div>
       </div>
 
-    
+      {/* PDF Modal */}
+      <PdfModal
+        isOpen={pdfModal.isOpen}
+        onClose={handleClosePdfModal}
+        pdfUrl={pdfModal.pdfUrl}
+        title={pdfModal.title}
+      />
     </div>
   );
 }
