@@ -74,6 +74,36 @@ export default function History() {
 
     return uniqueData;
   };
+  const handleCopyDOI = () => {
+    console.log("DOI:", doi);
+    if (navigator.clipboard && doi) {
+      navigator.clipboard
+        .writeText(doi)
+        .then(() => {
+          toast.current.show({
+            severity: "success",
+            summary: "Copied",
+            detail: "DOI copied to clipboard",
+            life: 3000,
+          });
+        })
+        .catch(() => {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to copy DOI",
+            life: 3000,
+          });
+        });
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Not Available",
+        detail: "DOI not available",
+        life: 3000,
+      });
+    }
+  };
 
   // Fetch history data from backend
   const fetchHistoryData = async () => {
@@ -489,6 +519,7 @@ export default function History() {
                             <div className="h-6 bg-gray-200 rounded-full w-16"></div>
                           </div>
                         </div>
+}
 
                         {/* Action buttons skeleton */}
                         <div className="flex flex-col space-y-2">
@@ -580,7 +611,8 @@ export default function History() {
                       publicationDate={paper.publicationDate}
                       citationCount={paper.citationCount}
                       viewPaperLink={viewLink}
-                      initialSaved={savedPapers.has(paper._id)} // Check if paper is saved
+                      doi={paper.doi} // ✅ هذا هو السطر المهم
+                      initialSaved={savedPapers.has(paper._id)}
                       onSavePaper={() => handleToggleSave(paper._id)}
                       onViewPaper={(link) => handleViewPaper(paper._id, link)}
                       onViewPdf={handleViewPdf}
@@ -615,6 +647,7 @@ export default function History() {
                     Try searching with different keywords in your history.
                   </p>
                 </div>
+                
               )}
 
               {/* Initial Empty State */}
@@ -696,6 +729,7 @@ export default function History() {
                   </button>
                 </div>
               )}
+              
             </div>
           </div>
         </div>
