@@ -26,7 +26,6 @@ const PaperCitation = ({
 }) => {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isLoading, setIsLoading] = useState(false);
-
   const getBadgeStyle = (badge) => {
     switch (badge) {
       case "Highly Cited":
@@ -34,6 +33,24 @@ const PaperCitation = ({
           background: "rgba(16, 183, 127, 0.15)",
           text: "#10b77f",
           border: "#10b77f",
+        };
+      case "Well Cited":
+        return {
+          background: "rgba(34, 197, 94, 0.15)",
+          text: "#22c55e",
+          border: "#22c55e",
+        };
+      case "Top 1% Most Cited":
+        return {
+          background: "rgba(5, 150, 105, 0.15)",
+          text: "#059669",
+          border: "#059669",
+        };
+      case "Top 10% Most Cited":
+        return {
+          background: 'rgba(16, 183, 127, 0.15)',
+          text: '#10b77f',
+          border: '#10b77f'
         };
       case "Open Access":
         return {
@@ -47,13 +64,26 @@ const PaperCitation = ({
           text: "#a855f7",
           border: "#a855f7",
         };
-      case "Outdated":
+      case "Multi-Author":
+        return {
+          background: "rgba(59, 130, 246, 0.15)",
+          text: "#3b82f6",
+          border: "#3b82f6",
+        };
+      case "Single Author":
         return {
           background: "rgba(107, 114, 128, 0.15)",
           text: "#6b7280",
           border: "#6b7280",
         };
       default:
+        if (badge.includes('Research')) {
+          return {
+            background: "rgba(99, 102, 241, 0.15)",
+            text: "#6366f1",
+            border: "#6366f1",
+          };
+        }
         return {
           background: "rgba(156, 163, 175, 0.15)",
           text: "#9ca3af",
