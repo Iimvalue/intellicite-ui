@@ -20,7 +20,7 @@ const Header = ({ logo, navigationItems = [] }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInitial, setUserInitial] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const [currentDate, setCurrentDate] = useState("");
   useEffect(() => {
     const checkAuth = async () => {
       const auth = await isAuthenticated();
@@ -40,10 +40,16 @@ const Header = ({ logo, navigationItems = [] }) => {
       }
     };
     checkAuth();
-  
-    // الاستماع لتغيرات auth مثل تسجيل الدخول/الخروج
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    setCurrentDate(formattedDate);
+
     window.addEventListener("authChange", checkAuth);
-  
+
     return () => {
       window.removeEventListener("authChange", checkAuth);
     };
@@ -92,18 +98,22 @@ const Header = ({ logo, navigationItems = [] }) => {
       <header className="w-full bg-white  fixed top-0 left-0 z-50">
         <div className="sm:px-7">
           {/* Font Controls */}
-          <div className="flex justify-end items-center py-1  border-b border-gray-200">
-            <div className="flex items-center space-x-2 text-sm">
+          <div className="flex justify-between items-center py-1 border-b border-gray-200 text-sm px-4">
+
+            <div className="text-gray-600">{currentDate}</div>
+
+
+            <div className="flex items-center space-x-2">
               <span className="text-gray-700 font-medium">Font Size:</span>
               <button
                 onClick={increaseFont}
-                className="text-[18px] px-2 text-blue-700 hover:text-blue-900 font-bold"
+                className="text-[18px] px-2 text-blue-800 hover:text-blue-900 font-bold hover:cursor-pointer hover:bg-gray-200 rounded-2xl"
               >
                 A+
               </button>
               <button
                 onClick={decreaseFont}
-                className="px-1 text-blue-700 hover:text-blue-900 font-bold"
+                className="px-1 text-blue-800 hover:text-blue-900 font-bold hover:cursor-pointer hover:bg-gray-200 rounded-2xl"
               >
                 A−
               </button>
@@ -196,7 +206,7 @@ const Header = ({ logo, navigationItems = [] }) => {
                 {/* Mobile menu toggle */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 text-gray-600 hover:text-blue-800"
+                  className="lg:hidden p-3 text-gray-600 hover:text-blue-800"
                 >
                   <svg
                     className="h-6 w-6"
