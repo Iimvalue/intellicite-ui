@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router";
-import { Toast } from 'primereact/toast';
+import { Toast } from "primereact/toast";
 import { login } from "./../services/authService";
+import { jwtDecode } from "jwt-decode"; 
 
 function Login() {
   const toast = useRef(null);
@@ -37,9 +38,10 @@ function Login() {
 
     if (emailError || passwordError) return;
 
-    setLoading(true); // Start loading
+    setLoading(true);
+
     try {
-      await login(email, password);
+      const res = await login(email, password);
 
       toast.current.show({
         severity: "success",
@@ -48,9 +50,21 @@ function Login() {
         life: 1000,
       });
 
-      setTimeout(() => {
+      const token = res?.data?.token;
+      if (token) {
+        const decoded = jwtDecode(token);
+        const role = decoded?.role;
+
+        setTimeout(() => {
+          if (role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/search");
+          }
+        }, 1000);
+      } else {
         navigate("/search");
-      }, 1000);
+      }
     } catch (error) {
       const backendMsg = error.response?.data?.message;
 
@@ -66,10 +80,9 @@ function Login() {
         general: customMessage,
       }));
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <Toast ref={toast} />

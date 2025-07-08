@@ -57,7 +57,9 @@ function Layout() {
     ...(isLoggedIn ? [{ label: "Search", path: "/search" }] : []),
     ...(isLoggedIn ? [{ label: "History", path: "/history" }] : []),
     ...(isLoggedIn ? [{ label: "Bookmarks", path: "/bookmarks" }] : []),
+    { label: "Search", path: "/search" },
     { label: "Citation Evaluation", path: "/citation" },
+   
   ];
 
   const footerNavigation = [
