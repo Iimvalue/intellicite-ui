@@ -239,7 +239,7 @@ export default function Home() {
     console.log("Saving paper:", paperId);
 
     try {
-      const response = await axiosInstance.post("/api/saved-papers/", {
+      const response = await axiosInstance.post("/api/bookmarks/", {
         paperId: paperId,
         notes: "Saved from search results for further research.",
       });
@@ -334,7 +334,7 @@ export default function Home() {
   const fetchSavedPaperIds = async () => {
     try {
       
-      const response = await axiosInstance.get("http://localhost:3000/api/saved-papers/");
+      const response = await axiosInstance.get("http://localhost:3000/api/bookmarks/");
 
       if (response.ok) {
         const data = await response.json();
@@ -358,7 +358,7 @@ export default function Home() {
 
     try {
       const response = await axiosInstance.delete(
-        `http://localhost:3000/api/saved-papers/${paperId}`
+        `http://localhost:3000/api/bookmarks/${paperId}`
       );
 
       if (response.status === 200) {

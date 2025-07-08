@@ -56,7 +56,7 @@ export default function Save() {
       setLoading(true);
       setError(null);
 
-      const response = await axiosInstance.get('api/saved-papers/');
+      const response = await axiosInstance.get('api/bookmarks/');
 
       if (response.data.success) {
         console.log("API Response:", response.data);
@@ -206,7 +206,7 @@ export default function Save() {
     console.log("Removing paper from saved:", paperId);
     
     try {
-      const response = await axiosInstance.delete(`api/saved-papers/${paperId}`);
+      const response = await axiosInstance.delete(`api/bookmarks/${paperId}`);
 
       if (response.status === 200) {
         // Remove from local state immediately for better UX
