@@ -108,7 +108,7 @@ export default function History() {
   // Fetch saved papers to check which ones are already saved
   const fetchSavedPaperIds = async () => {
     try {
-      const response = await axiosInstance.get("/api/saved-papers/");
+      const response = await axiosInstance.get("/api/bookmarks/");
 
       if (response.status === 200) {
         const data = response.data;
@@ -311,7 +311,7 @@ export default function History() {
     console.log("Saving paper:", paperId);
 
     try {
-      const response = await axiosInstance.post("/api/saved-papers/", {
+      const response = await axiosInstance.post("/api/bookmarks/", {
         paperId: paperId,
         notes: "Saved from search results for further research.",
       });
@@ -346,7 +346,7 @@ export default function History() {
 
     try {
       const response = await axiosInstance.delete(
-        `/api/saved-papers/${paperId}`
+        `/api/bookmarks/${paperId}`
       );
 
       if (response.status === 200) {

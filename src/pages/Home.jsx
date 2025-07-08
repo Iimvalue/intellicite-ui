@@ -334,7 +334,7 @@ export default function Home() {
   const fetchSavedPaperIds = async () => {
     try {
       
-      const response = await axiosInstance.get("http://localhost:3000/api/bookmarks/");
+      const response = await axiosInstance.get("/api/bookmarks/");
 
       if (response.ok) {
         const data = await response.json();
@@ -358,7 +358,7 @@ export default function Home() {
 
     try {
       const response = await axiosInstance.delete(
-        `http://localhost:3000/api/bookmarks/${paperId}`
+        `/api/bookmarks/${paperId}`
       );
 
       if (response.status === 200) {
