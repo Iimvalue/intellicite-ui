@@ -15,8 +15,8 @@ export default function Home() {
   const [savedPapers, setSavedPapers] = useState(new Set()); // Track saved paper IDs
   const [loading, setLoading] = useState(false);
   // Mobile filter visibility
-  const [showFiltersMobile, setShowFiltersMobile] = useState(false)
-const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
+  const [showFiltersMobile, setShowFiltersMobile] = useState(false);
+  const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
 
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -339,8 +339,9 @@ const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
   // Fetch saved papers to check which ones are already saved
   const fetchSavedPaperIds = async () => {
     try {
-      
-      const response = await axiosInstance.get("http://localhost:3000/api/bookmarks/");
+      const response = await axiosInstance.get(
+        "http://localhost:3000/api/bookmarks/"
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -403,7 +404,7 @@ const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 lg:px-20"> 
+    <div className="min-h-screen bg-gray-50 pt-20 lg:px-20">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
@@ -416,55 +417,51 @@ const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
               className="lg:sticky lg:top-4"
             />
           </div>
-{/* Right Content Area */}
-<div className="flex-1 space-y-6 sm:space-y-8 ">
+          {/* Right Content Area */}
+          <div className="flex-1 space-y-6 sm:space-y-8 ">
+            {/* Mobile only: SearchBar + Filter side by side */}
+            <div className="flex items-center gap-2 lg:hidden mb-4 w-full">
+              <div className="flex-1">
+                <SearchBar
+                  placeholder="Enter Your Research Topic"
+                  onSearch={handleSearch}
+                  onInputChange={setSearchQuery}
+                  initialValue={searchQuery}
+                  className="w-full"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="px-5 py-6 text-sm"
+                onClick={() => setShowFiltersMobile((prev) => !prev)}
+              >
+                <Filter className="w-5 h-5" />
+              </Button>
+            </div>
 
-  {/* Mobile only: SearchBar + Filter side by side */}
-  <div className="flex items-center gap-2 lg:hidden mb-4 w-full">
-    <div className="flex-1">
-      <SearchBar
-        placeholder="Enter Your Research Topic"
-        onSearch={handleSearch}
-        onInputChange={setSearchQuery}
-        initialValue={searchQuery}
-        className="w-full"
-      />
-    </div>
-    <Button
-      variant="outline"
-      size="icon"
-           className="px-5 py-6 text-sm"
-      onClick={() => setShowFiltersMobile((prev) => !prev)}
-    >
-      <Filter className="w-5 h-5" />
-    </Button>
-  </div>
+            {/* Desktop only: Full-width SearchBar */}
+            <div className="hidden lg:block mb-4 w-full">
+              <SearchBar
+                placeholder="Enter Your Research Topic"
+                onSearch={handleSearch}
+                onInputChange={setSearchQuery}
+                initialValue={searchQuery}
+                className="w-full"
+              />
+            </div>
 
-  {/* Desktop only: Full-width SearchBar */}
-  <div className="hidden lg:block mb-4 w-full">
-    <SearchBar
-      placeholder="Enter Your Research Topic"
-      onSearch={handleSearch}
-      onInputChange={setSearchQuery}
-      initialValue={searchQuery}
-      className="w-full"
-    />
-  </div>
-
-  {/* Mobile FilterDropdown (after search & button) */}
-  {showFiltersMobile && (
-    <div className="lg:hidden mb-6">
-      <FilterDropdown
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onApplyFilter={handleApplyFilter}
-              className="lg:sticky lg:top-4"
-            />
-          </div>
-  )}
-
-
-
+            {/* Mobile FilterDropdown (after search & button) */}
+            {showFiltersMobile && (
+              <div className="lg:hidden mb-6">
+                <FilterDropdown
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onApplyFilter={handleApplyFilter}
+                  className="lg:sticky lg:top-4"
+                />
+              </div>
+            )}
 
             {/* Results Section */}
             <div>
@@ -495,11 +492,10 @@ const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
                   ))}
                 </div>
               )}
-       
 
               {/* Papers List */}
               {!loading && (
-                <div className="space-y-4 sm:space-y-6">     
+                <div className="space-y-4 sm:space-y-6">
                   {papers.map((item) => {
                     const paper = item.paper;
                     const reportText = item.reportText || "";
