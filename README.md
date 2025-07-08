@@ -1,21 +1,80 @@
-# Academic Research Tool
+# IntelliCite
 
-A comprehensive platform designed to help students and researchers discover, analyze, and manage academic papers efficiently.
+## نبذة عن المشروع
 
-## Overview
+IntelliCite هو أداة مساعدة للبحث الأكاديمي تساعد الطلاب والباحثين على اكتشاف وتقييم وإدارة الأوراق الأكاديمية من خلال سير عمل مبسط. يقوم المستخدمون بالبحث حسب الموضوع ويحصلون على تقارير مدعومة بالذكاء الاصطناعي تشرح مدى صلة كل ورقة بحثية باستفسارهم، بالإضافة إلى شارات تقييم تلقائية مثل "عالي الاستشهاد" أو "قديم" بناءً على مقاييس الاستشهاد. يتضمن النظام ميزات عملية لحفظ الأوراق وتوليد الاستشهادات بتنسيقات متعددة وتتبع تاريخ البحث والوصول إلى ملفات PDF الكاملة، بالإضافة إلى أداة "Cite Check" التي تقيم جودة الأوراق وتقترح بدائل أفضل للمصادر الضعيفة. تتضمن الميزات المستقبلية المخططة إمكانية إنشاء ملصقات أكاديمية، مما يجعل هذا حلاً شاملاً لسير العمل البحثي يتجاوز مجرد اكتشاف الأوراق ليوفر تحليلاً ذكياً وتقييماً للجودة.
 
-This project is a tool that helps students and researchers find and understand academic papers. Users enter a topic or question, and the system retrieves papers using APIs such as Semantic Scholar. It ranks papers by relevance using embeddings and provides concise GPT reports that explain each paper's content and its relation to the user's query—whether it supports, contradicts, or forms a foundation for the topic.
+## الفئة المستهدفة
+
+- الباحثون الأكاديميون
+- طلاب الجامعات
+- الطلاب في الدراسات العليا
 
 
-# React + Vite
+## الميزات الرئيسية
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### البحث والاكتشاف
+- البحث عن الأوراق الأكاديمية حسب الموضوع
+- تكامل مع APIs مثل Semantic Scholar
+- تقارير مدعومة بالذكاء الاصطناعي
 
-Currently, two official plugins are available:
+### التقييم والتحليل
+- شارات تقييم تلقائية ("عالي الاستشهاد"، "حديث"، "قديم")
+- أداة "Cite Check" للتحقق من جودة الأوراق
+- اقتراح بدائل أفضل للمصادر الضعيفة
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### الإدارة والتنظيم
+- حفظ الأوراق للرجوع إليها لاحقاً
+- تتبع تاريخ البحث
+- الوصول إلى ملفات PDF الكاملة
 
-## Expanding the ESLint configuration
+### الاستشهاد والتوثيق
+- توليد الاستشهادات بتنسيقات متعددة (APA، MLA، إلخ)
+- تصدير الاستشهادات
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+## تصميم المشروع
+
+يمكن الاطلاع على التصميم الخاص بالمشروع عبر الرابط التالي:
+
+**Figma:** [https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1](https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1)
+
+## رابط النشر
+
+Backend API: https://intellicite-api.onrender.com
+
+## التقنيات المستخدمة
+
+| التقنية | الوصف |
+|---------|--------|
+| **React.js/Vite** | إطار عمل JavaScript للواجهة الأمامية |
+| **Tailwind CSS** | إطار عمل CSS للتصميم |
+| **shadcn** | مكتبة مكونات UI |
+| **Axios** | مكتبة لطلبات HTTP |
+| **React Icons** | مكتبة الأيقونات |
+| **Lucide React** | مكتبة أيقونات إضافية |
+| **JWT** | نظام المصادقة والأمان |
+
+## فريق العمل
+
+- **عبدالرحمن الطامي**
+- **عائشة عبدالله**
+- **انتصار العتيبي**
+- **طلال المطيري**
+
+## التثبيت والتشغيل
+
+```bash
+# استنساخ المشروع
+git clone [repository-url]
+
+# الانتقال إلى مجلد المشروع
+cd intellicite
+
+# تثبيت التبعيات
+npm install
+
+# تشغيل المشروع
+npm run dev
+```
