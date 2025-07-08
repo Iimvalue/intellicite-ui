@@ -1,3 +1,4 @@
+import Cite from "citation-js";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -337,7 +338,49 @@ const PaperCard = ({
       onViewPaper(null);
     }
   };
-
+  const generateCitations = ({ title, authors = [], journal, doi, sourceLink, publicationDate }) => {
+    try {
+      const citationAuthors = authors.map((author) => {
+        const parts = author.trim().split(" ");
+        const lastName = parts.pop();
+        const firstName = parts.join(" ");
+        return {
+          family: lastName,
+          given: firstName,
+        };
+      });
+  
+      const pubDate = new Date(publicationDate);
+      const citationData = {
+        type: 'article-journal',
+        title,
+        author: citationAuthors,
+        'container-title': journal,
+        DOI: doi,
+        URL: sourceLink || '',
+        issued: { 'date-parts': [[pubDate.getFullYear(), pubDate.getMonth() + 1, pubDate.getDate()]] },
+        accessed: { 'date-parts': [[new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]] },
+      };
+  
+      const citation = new Cite(citationData);
+  
+      return {
+        mla: citation.format('bibliography', {
+          format: 'text',
+          template: 'modern-language-association',
+          lang: 'en-US',
+        }).trim(),
+        apa: citation.format('bibliography', {
+          format: 'text',
+          template: 'apa',
+          lang: 'en-US',
+        }).trim(),
+      };
+    } catch (error) {
+      console.error('Citation generation error:', error);
+      return { mla: '', apa: '' };
+    }
+  };
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -380,7 +423,6 @@ const PaperCard = ({
         });
       });
   };
-
 
   const shouldShowViewMore = description && description.length > 200;
 
@@ -498,17 +540,18 @@ const PaperCard = ({
           {/* Citation Count */}
           {/* Copy DOI Button */}
           <div className="flex items-center text-gray-500 space-x-2">
-      {/* <span className="text-sm text-gray-700 truncate max-w-[70%] bg-gray-100 p-2 rounded-md">Doi</span> */}
+            {/* <span className="text-sm text-gray-700 truncate max-w-[70%] bg-gray-100 p-2 rounded-md">Doi</span> */}
 
-      <button
-        onClick={() => handleCopyDOI(doi)}
-        className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-        title={doi}
-      >
-        <FiClipboard size={18} />
-      </button>
-    </div>
+            <button
+              onClick={() => handleCopyDOI(doi)}
+              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+              title={doi}
+            >
+              <FiClipboard size={18} />
+            </button>
+          </div>
           {/* Action Button */}
+          
           <Button
             onClick={handleViewPaper}
             className={`transition-all duration-200 font-medium ${

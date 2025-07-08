@@ -2,76 +2,76 @@
 import axios from "axios";
 import { getValidToken, isTokenExpired } from "./tokenService";
 
-// Create axios instance with base URL and timeout
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL || "https://intellicite-api.onrender.com",  // Base URL from environment variable
-  timeout: 30000,  // 30 seconds timeout for requests
+  baseURL:
+    import.meta.env.VITE_BASE_URL || "https://intellicite-api.onrender.com",
+  timeout: 30000,
   headers: {
-    "Content-Type": "application/json",  // Default headers for JSON requests
+    "Content-Type": "application/json",
   },
 });
 
-// Request interceptor to add Authorization header if token is valid
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getValidToken();  // Retrieve token from localStorage or other source
+    const token = getValidToken();
 
     if (token) {
       if (isTokenExpired(token)) {
-        // If token is expired, clear storage and redirect to login page
-        localStorage.clear();
-        if (typeof window !== "undefined") window.location.href = "/";
-        return Promise.reject(new Error("Token expired"));
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("authChange"));
+          window.location.href = "/";
+        }
+        return Promise.reject(new Error("Access token expired"));
       }
-      // Attach token to Authorization header for all requests
+
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    return config;  // Return config to proceed with request
+    return config;
   },
-  (error) => Promise.reject(error)  // Handle request error
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle 401 errors (Unauthorized)
 axiosInstance.interceptors.response.use(
-  (response) => response,  // Return successful response directly
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Check if error is 401 and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;  // Mark request as retried to avoid loops
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      localStorage.getItem("refreshToken")
+    ) {
+      originalRequest._retry = true;
+
       try {
         const refreshToken = localStorage.getItem("refreshToken");
+        const refreshResponse = await axios.post(
+          `${axiosInstance.defaults.baseURL}/api/auth/refresh`,
+          { refreshToken }
+        );
 
-        if (refreshToken) {
-          // Attempt to refresh access token using the refresh token
-          const refreshResponse = await axios.post(
-            `${axiosInstance.defaults.baseURL}/api/auth/refresh`,
-            { refreshToken }
-          );
+        const { accessToken: newToken, refreshToken: newRefreshToken } =
+          refreshResponse.data.data;
 
-          const { accessToken: newToken, refreshToken: newRefreshToken } =
-            refreshResponse.data.data;
+        localStorage.setItem("token", newToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
 
-          // Save new tokens in localStorage
-          localStorage.setItem("token", newToken);
-          localStorage.setItem("refreshToken", newRefreshToken);
-
-          // Update Authorization header with new token and retry original request
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-          return axiosInstance(originalRequest);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("authChange"));
+          window.location.href = "/";
         }
-      } catch (err) {
-        // If refresh fails, clear storage and redirect to login page
-        localStorage.clear();
-        if (typeof window !== "undefined") window.location.href = "/";
-        return Promise.reject(err);
+        return Promise.reject(refreshError);
       }
     }
 
-    // For other errors, reject the promise
     return Promise.reject(error);
   }
 );

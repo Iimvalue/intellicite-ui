@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -24,6 +24,8 @@ import {
   Settings,
   AdminProtectedRoute,
 } from "../admin";
+
+// حماية الصفحات الخاصة بالمستخدم
 const ProtectedRoute = () => {
   const location = useLocation();
   const token = localStorage.getItem("token");
@@ -35,22 +37,38 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-const navigationList = [
-  { label: "Home", path: "/" },
-  { label: "Search", path: "/search" },
-  { label: "History", path: "/history" },
-  { label: "Bookmarks", path: "/bookmarks" },
-  { label: "Citation Evaluation", path: "/citation" },
-];
-
-const footerNavigation = [
-  { label: "About", path: "/about" },
-  { label: "Contact", path: "/contact" },
-  { label: "Terms of Service", path: "/terms" },
-  { label: "Privacy Policy", path: "/privacy" },
-];
-
+// مكون التخطيط العام
 function Layout() {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("authChange", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChange", handleAuthChange);
+    };
+  }, []);
+
+  // القائمة العليا حسب حالة المستخدم
+  const navigationList = [
+    { label: "Home", path: "/" },
+    ...(isLoggedIn ? [{ label: "Search", path: "/search" }] : []),
+    ...(isLoggedIn ? [{ label: "History", path: "/history" }] : []),
+    ...(isLoggedIn ? [{ label: "Bookmarks", path: "/bookmarks" }] : []),
+    { label: "Citation Evaluation", path: "/citation" },
+  ];
+
+  const footerNavigation = [
+    { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
+    { label: "Terms of Service", path: "/terms" },
+    { label: "Privacy Policy", path: "/privacy" },
+  ];
+
   return (
     <>
       <Header logo={"/logo.png"} navigationItems={navigationList} />
@@ -63,6 +81,7 @@ function Layout() {
   );
 }
 
+// تعريف المسارات
 const router = createBrowserRouter([
   {
     path: "/",
@@ -72,23 +91,16 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "citation", element: <Citation /> },
-
       {
         element: <ProtectedRoute />,
         children: [
           { path: "history", element: <History /> },
-          {
-            path: "bookmarks",
-            element: <Save />,
-          },
+          { path: "bookmarks", element: <Save /> },
           { path: "profile", element: <Profile /> },
           { path: "poster", element: <h1>Poster Creation</h1> },
         ],
       },
-      {
-        path: "/",
-        element: <LandingPage />,
-      },
+      { path: "/", element: <LandingPage /> },
     ],
   },
   {
@@ -130,6 +142,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+// مكون رئيسي يحتوي على الرواتر
 export default function Router() {
   return <RouterProvider router={router} />;
 }
