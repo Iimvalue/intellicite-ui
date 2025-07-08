@@ -23,10 +23,13 @@ const Header = ({ logo, navigationItems = [] }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (isAuthenticated()) {
+      const auth = await isAuthenticated();
+      console.log("Auth status:", auth);
+      if (auth) {
         setIsLoggedIn(true);
         try {
           const profile = await getProfile();
+          console.log("Profile:", profile);
           setUserInitial(profile.user.name?.charAt(0).toUpperCase() || "U");
         } catch (error) {
           console.error("Failed to fetch profile:", error);
@@ -37,8 +40,14 @@ const Header = ({ logo, navigationItems = [] }) => {
       }
     };
     checkAuth();
+  
+    // الاستماع لتغيرات auth مثل تسجيل الدخول/الخروج
+    window.addEventListener("authChange", checkAuth);
+  
+    return () => {
+      window.removeEventListener("authChange", checkAuth);
+    };
   }, [location.pathname]);
-
   const increaseFont = () => {
     const newSize = Math.min(fontSize + 10, 150);
     setFontSize(newSize);
@@ -86,8 +95,18 @@ const Header = ({ logo, navigationItems = [] }) => {
           <div className="flex justify-end items-center py-1  border-b border-gray-200">
             <div className="flex items-center space-x-2 text-sm">
               <span className="text-gray-700 font-medium">Font Size:</span>
-              <button onClick={increaseFont} className="text-[18px] px-2 text-blue-700 hover:text-blue-900 font-bold">A+</button>
-              <button onClick={decreaseFont} className="px-1 text-blue-700 hover:text-blue-900 font-bold">A−</button>
+              <button
+                onClick={increaseFont}
+                className="text-[18px] px-2 text-blue-700 hover:text-blue-900 font-bold"
+              >
+                A+
+              </button>
+              <button
+                onClick={decreaseFont}
+                className="px-1 text-blue-700 hover:text-blue-900 font-bold"
+              >
+                A−
+              </button>
             </div>
           </div>
 
@@ -99,8 +118,14 @@ const Header = ({ logo, navigationItems = [] }) => {
                 <Link to="/landing" className="flex items-center">
                   {logo ? (
                     typeof logo === "string" ? (
-                      <img src={logo} alt="Logo" className="h-12 w-12  rounded-2xl" />
-                    ) : logo
+                      <img
+                        src={logo}
+                        alt="Logo"
+                        className="h-12 w-12  rounded-2xl"
+                      />
+                    ) : (
+                      logo
+                    )
                   ) : (
                     <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-900 text-white">
                       <span className="text-xl font-bold">I</span>
@@ -173,11 +198,26 @@ const Header = ({ logo, navigationItems = [] }) => {
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="lg:hidden p-2 text-gray-600 hover:text-blue-800"
                 >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     {isMobileMenuOpen ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
                     )}
                   </svg>
                 </button>
@@ -208,7 +248,9 @@ const Header = ({ logo, navigationItems = [] }) => {
                         <div className="w-9 h-9 rounded-full bg-blue-800 text-white flex items-center justify-center text-sm font-semibold">
                           {userInitial}
                         </div>
-                        <div className="text-sm font-medium text-gray-800">My Account</div>
+                        <div className="text-sm font-medium text-gray-800">
+                          My Account
+                        </div>
                       </div>
                       <button
                         onClick={() => {

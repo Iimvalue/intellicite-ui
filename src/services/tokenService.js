@@ -10,7 +10,9 @@ export function getValidToken() {
 
   return token;
 }
-
+export function getAccessToken() {
+  return getValidToken();
+}
 export function isTokenExpired(token) {
   try {
     const decoded = jwtDecode(token); // updated

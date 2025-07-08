@@ -1,7 +1,6 @@
 import axiosInstance from "./axiosInstance";
 import * as tokenService from "./tokenService";
 
-// تسجيل مستخدم جديد
 export const register = async (name, email, password) => {
   try {
     const response = await axiosInstance.post("/api/users/register", {
@@ -26,7 +25,6 @@ export const register = async (name, email, password) => {
   }
 };
 
-// تسجيل الدخول
 export const login = async (email, password) => {
   try {
     const response = await axiosInstance.post("/api/users/login", {
@@ -50,7 +48,6 @@ export const login = async (email, password) => {
   }
 };
 
-// جلب بيانات المستخدم
 export const getProfile = async () => {
   try {
     const response = await axiosInstance.get("/api/users/profile");
@@ -65,7 +62,6 @@ export const getProfile = async () => {
   }
 };
 
-// تعديل بيانات المستخدم
 export const updateProfile = async (name, email, profileImage) => {
   try {
     const response = await axiosInstance.put("/api/users/profile", {
@@ -84,15 +80,13 @@ export const updateProfile = async (name, email, profileImage) => {
   }
 };
 
-// تسجيل الخروج
 export const logout = () => {
   localStorage.removeItem("token");
   window.dispatchEvent(new Event("authChange"));
 };
 
-// التحقق من صحة التوكن
 export const isAuthenticated = async () => {
-  const token = tokenService.getAccessToken();
+  const token = tokenService.getValidToken();
   if (!token) return false;
 
   try {

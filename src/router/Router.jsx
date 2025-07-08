@@ -25,7 +25,6 @@ import {
   AdminProtectedRoute,
 } from "../admin";
 
-// حماية الصفحات الخاصة بالمستخدم
 const ProtectedRoute = () => {
   const location = useLocation();
   const token = localStorage.getItem("token");
@@ -37,7 +36,6 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-// مكون التخطيط العام
 function Layout() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
@@ -53,7 +51,6 @@ function Layout() {
     };
   }, []);
 
-  // القائمة العليا حسب حالة المستخدم
   const navigationList = [
     { label: "Home", path: "/" },
     ...(isLoggedIn ? [{ label: "Search", path: "/search" }] : []),
@@ -81,7 +78,6 @@ function Layout() {
   );
 }
 
-// تعريف المسارات
 const router = createBrowserRouter([
   {
     path: "/",
