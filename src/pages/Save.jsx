@@ -442,7 +442,7 @@ export default function Save() {
             <div>
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
-                  Saved Papers
+                  Bookmarked Papers
                   {papers.length !== allPapers.length &&
                     allPapers.length > 0 && (
                       <span className="ml-2 text-sm font-normal text-gray-500">

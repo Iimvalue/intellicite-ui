@@ -331,7 +331,7 @@ const Header = ({ logo, navigationItems = [] }) => {
                           navigate("/profile");
                           setIsMobileMenuOpen(false);
                         }}
-                        className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                        className=" w-full text-left text-sm px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
                       >
                         <User className="h-5 w-5 text-gray-600" />
                         <span>Profile</span>
@@ -341,7 +341,7 @@ const Header = ({ logo, navigationItems = [] }) => {
                           handleLogout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="block w-full text-left text-sm px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center space-x-2"
+                        className=" w-full text-left text-sm px-4 py-2 text-red-600 hover:bg-gray-100 flex items-center space-x-2"
                       >
                         <LogOut className="h-5 w-5" />
                         <span>Logout</span>
