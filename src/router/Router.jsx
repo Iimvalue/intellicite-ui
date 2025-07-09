@@ -106,22 +106,22 @@ function Layout() {
   const footerNavigation = [
     {
       label: "About",
-      path: "/about",
+
       icon: <InfoIcon className="inline-block w-5 h-5 mr-1" />,
     },
     {
       label: "Contact",
-      path: "/contact",
+
       icon: <MailIcon className="inline-block w-5 h-5 mr-1" />,
     },
     {
       label: "Terms of Service",
-      path: "/terms",
+
       icon: <FileIcon className="inline-block w-5 h-5 mr-1" />,
     },
     {
       label: "Privacy Policy",
-      path: "/privacy",
+
       icon: <ShieldIcon className="inline-block w-5 h-5 mr-1" />,
     },
   ];
