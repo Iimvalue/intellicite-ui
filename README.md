@@ -40,12 +40,17 @@ IntelliCite هو أداة مساعدة للبحث الأكاديمي تساعد 
 
 **Figma:** [https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1](https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1)
 
-## رابط النشر
+## روابط النشر
 Frontend: https://intellicite-ui.onrender.com
 Backend API: https://intellicite-api.onrender.com
 
+## روابط GTIHUB
+Frontend: https://github.com/Iimvalue/intellicite-ui
+Backend: https://github.com/Iimvalue/intellicite-api
+
 ## التقنيات المستخدمة
 
+### Frontend
 | التقنية | الوصف |
 |---------|--------|
 | **React.js/Vite** | إطار عمل JavaScript للواجهة الأمامية |
@@ -55,6 +60,20 @@ Backend API: https://intellicite-api.onrender.com
 | **React Icons** | مكتبة الأيقونات |
 | **Lucide React** | مكتبة أيقونات إضافية |
 | **JWT** | نظام المصادقة والأمان |
+
+### Backend
+| **التقنية** | **الوصف** |
+|-------------|-----------|
+| **Node.js** | بيئة تشغيل JavaScript للخادم |
+| **Express.js** | إطار عمل Node.js لبناء APIs |
+| **MongoDB/Mongoose** | قاعدة بيانات NoSQL ومكتبة ODM |
+| **JWT (jsonwebtoken)** | نظام المصادقة والأمان |
+| **bcryptjs** | مكتبة تشفير كلمات المرور |
+| **Axios** | مكتبة لطلبات HTTP |
+| **OpenAI API** | تكامل مع خدمات الذكاء الاصطناعي |
+| **CORS** | إدارة مشاركة الموارد عبر المنشأ |
+| **Helmet** | حماية أمان إضافية للتطبيق |
+| **dotenv** | إدارة متغيرات البيئة |
 
 ## فريق العمل
 
