@@ -106,7 +106,7 @@ export default function Profile() {
                       "Something went wrong. Please try again.";
                     if (backendMsg === "User with this email already exists") {
                       customMessage =
-                        "This email is already registered. Please log in.";
+                        "This email is already registered, Please try a diffrferent email";
                     }
                     toast.current.show({
                       severity: "error",
