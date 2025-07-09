@@ -149,7 +149,7 @@ function Citation() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Research Topic"
+                placeholder="Enter Your Research Topic"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white "
               />
             </div>

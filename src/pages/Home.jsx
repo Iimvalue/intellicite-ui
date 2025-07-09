@@ -431,7 +431,7 @@ export default function Home() {
                   onSearch={handleSearch}
                   onInputChange={setSearchQuery}
                   initialValue={searchQuery}
-                  className="w-full"
+                  className="w-full text-sm"
                 />
               </div>
               <Button
@@ -445,7 +445,7 @@ export default function Home() {
             </div>
 
             {/* Desktop only: Full-width SearchBar */}
-            <div className="hidden lg:block mb-4 w-full">
+            <div className="hidden lg:block mb-4 w-full ">
               <SearchBar
                 placeholder="Enter Your Research Topic"
                 onSearch={handleSearch}

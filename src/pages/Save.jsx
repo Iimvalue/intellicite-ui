@@ -402,7 +402,7 @@ export default function Save() {
                   onSearch={handleSearch}
                   onInputChange={setSearchQuery}
                   initialValue={searchQuery}
-                  className="w-full"
+                  className="w-full text-sm"
                 />
               </div>
               <Button
