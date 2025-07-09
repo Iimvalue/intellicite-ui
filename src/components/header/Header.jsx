@@ -179,7 +179,7 @@ const Header = ({ logo, navigationItems = [] }) => {
 
           {/* Navigation */}
           <div className="">
-            <div className="flex items-center justify-between m-1 ">
+            <div className="flex items-center justify-between m-1 px-3 ">
               {/* Logo */}
               <div className="flex-shrink-0">
                 <Link to="/" className="flex items-center">
@@ -207,7 +207,7 @@ const Header = ({ logo, navigationItems = [] }) => {
                   <Link
                     key={index}
                     to={item.path}
-                    className={`text-sm font-medium py-2 px-3 rounded-lg transition-all flex items-center ${
+                    className={`text-sm font-medium py-2 rounded-lg transition-all flex items-center ${
                       location.pathname === item.path
                         ? "text-blue-900 bg-blue-100"
                         : "text-gray-600 hover:bg-gray-100"
