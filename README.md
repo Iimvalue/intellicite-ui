@@ -41,12 +41,12 @@ IntelliCite هو أداة مساعدة للبحث الأكاديمي تساعد 
 **Figma:** [https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1](https://www.figma.com/design/AOBplsedeefft6SPW3KOt5/Final-Tuwaiq-Project?t=MxYOGKv0Wr0tDNN5-1)
 
 ## روابط النشر
-Frontend: https://intellicite-ui.onrender.com
-Backend API: https://intellicite-api.onrender.com
+- Frontend: https://intellicite-ui.onrender.com
+- Backend API: https://intellicite-api.onrender.com
 
 ## روابط GTIHUB
-Frontend: https://github.com/Iimvalue/intellicite-ui
-Backend: https://github.com/Iimvalue/intellicite-api
+- Frontend: https://github.com/Iimvalue/intellicite-ui
+- Backend: https://github.com/Iimvalue/intellicite-api
 
 ## التقنيات المستخدمة
 
