@@ -140,7 +140,7 @@ export default function Profile() {
       />
 
       {isAuthenticated() ? (
-        <div className="min-h-screen bg-gray-50 pt-25">
+        <div className="min-h-screen bg-gray-50 pt-28">
           {" "}
           {/* Main Content */}
           <div className="max-w-4xl mx-auto space-y-10">
