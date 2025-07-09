@@ -153,7 +153,7 @@ const router = createBrowserRouter([
           { path: "history", element: <History /> },
           { path: "bookmarks", element: <Save /> },
           { path: "profile", element: <Profile /> },
-          { path: "poster", element: <h1>Poster Creation</h1> },
+         ,
         ],
       },
       { path: "/", element: <LandingPage /> },

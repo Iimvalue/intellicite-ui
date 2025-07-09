@@ -1,12 +1,15 @@
 import FilterDropdown from "../components/filter-dropdown/FilterDropdown";
 import PdfModal from "../components/modal/Modal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SearchBar from "../components/searchbar/SearchBar";
 import PaperCard from "../components/cards/paper/PaperCard";
 import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
 import axiosInstance from "../services/axiosInstance";
 import { Button } from "../components/ui/button";
 import { Filter } from "lucide-react";
+import { useNavigate } from "react-router";
+import { getValidToken } from "../services/tokenService";
+import { Toast } from "primereact/toast";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +20,9 @@ export default function Home() {
   // Mobile filter visibility
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
   const toggleFilters = () => setShowFiltersMobile(!showFiltersMobile);
+
+  const navigate = useNavigate();
+  const toast = useRef(null);
 
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -329,6 +335,20 @@ export default function Home() {
   };
 
   const handleSearch = (query) => {
+    const token = getValidToken();
+
+    if (!token) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Login required to perform search",
+        life: 3000,
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000); 
+      return;
+    }
+
     setSearchQuery(query);
     setFilters({
       dateRange: "any",
@@ -349,7 +369,6 @@ export default function Home() {
   // Fetch saved papers to check which ones are already saved
   const fetchSavedPaperIds = async () => {
     try {
-      
       const response = await axiosInstance.get("/api/bookmarks/");
 
       if (response.ok) {
@@ -373,9 +392,7 @@ export default function Home() {
     console.log("Removing paper from saved:", paperId);
 
     try {
-      const response = await axiosInstance.delete(
-        `/api/bookmarks/${paperId}`
-      );
+      const response = await axiosInstance.delete(`/api/bookmarks/${paperId}`);
 
       if (response.status === 200) {
         console.log("Paper unsaved successfully");
@@ -410,6 +427,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 pt-20 lg:px-20">
       {/* Main Content */}
+      <Toast ref={toast} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-40">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
           {/* Left Sidebar - Filter Panel */}
@@ -508,8 +526,6 @@ export default function Home() {
                       paper.pdfLink && paper.pdfLink.trim() !== ""
                         ? paper.pdfLink
                         : paper.sourceLink;
-
-
 
                     return (
                       <PaperCard

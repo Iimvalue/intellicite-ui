@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import PdfModal from "../components/modal/Modal";
 import PaperCitation from "../components/cards/paper/PaperCitation";
 import PaperSkeletonCard from "../components/cards/paper-sekelton/PaperSkeletonCard";
 import axiosInstance from "../services/axiosInstance";
+import { useNavigate } from "react-router";
+import { getValidToken } from "../services/tokenService";
+import { Toast } from "primereact/toast";
 
 function Citation() {
   const [doi, setDoi] = useState("");
@@ -18,7 +21,23 @@ function Citation() {
     title: "",
   });
 
+  const navigate = useNavigate();
+  const toast = useRef(null);
+  const token = getValidToken();
+
   const handleCheck = async () => {
+    if (!token) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Login required to perform search",
+        life: 3000,
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      return;
+    }
+
     if (!doi.trim() || !query.trim()) return;
     setLoading(true);
     setError(null);
@@ -41,13 +60,13 @@ function Citation() {
       } else {
         setError("Citation check failed");
       }
-        } catch (err) {
+    } catch (err) {
       console.error("Evaluation error:", err);
       setError("Server error during evaluation");
-        } finally {
+    } finally {
       setLoading(false);
-        }
-      };
+    }
+  };
 
   const handleViewPdf = (pdfUrl, title) => {
     setPdfModal({ isOpen: true, pdfUrl, title });
@@ -72,17 +91,17 @@ function Citation() {
     return `Published in ${paper.journal} (${year})`;
   };
 
-    // Load saved papers on component mount
-    useEffect(() => {
-      loadPersistedState();
-    }, []);
-  
-    // Debug effect to log saved papers state
-    useEffect(() => {
-      console.log("Saved papers updated:", Array.from(savedPapers));
-    }, [savedPapers]);
+  // Load saved papers on component mount
+  useEffect(() => {
+    loadPersistedState();
+  }, []);
 
-    // Load persisted state from localStorage
+  // Debug effect to log saved papers state
+  useEffect(() => {
+    console.log("Saved papers updated:", Array.from(savedPapers));
+  }, [savedPapers]);
+
+  // Load persisted state from localStorage
   const loadPersistedState = () => {
     try {
       const savedState = localStorage.getItem("homePageState");
@@ -123,8 +142,11 @@ function Citation() {
   };
 
   return (
-<div className="min-h-screen bg-gray-50 pt-20">    {/* Main Content */}
-<div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="min-h-screen bg-gray-50 pt-20">
+      {" "}
+      <Toast ref={toast} />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-10 space-y-10">
         {/* Title & Intro */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
