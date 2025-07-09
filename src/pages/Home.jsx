@@ -47,18 +47,15 @@ export default function Home() {
     { label: "Privacy Policy", path: "/privacy" },
   ];
 
-  // Load saved papers on component mount
   useEffect(() => {
     fetchSavedPaperIds();
     loadPersistedState();
   }, []);
 
-  // Debug effect to log saved papers state
   useEffect(() => {
     console.log("Saved papers updated:", Array.from(savedPapers));
   }, [savedPapers]);
 
-  // Persist state to localStorage whenever search results change
   useEffect(() => {
     if (papers.length > 0 || searchQuery) {
       const stateToSave = {
@@ -66,7 +63,6 @@ export default function Home() {
         papers,
         allPapers,
         filters,
-        timestamp: Date.now(),
       };
       localStorage.setItem("homePageState", JSON.stringify(stateToSave));
       console.log("Home state saved to localStorage");
@@ -101,26 +97,19 @@ export default function Home() {
       if (savedState) {
         const parsedState = JSON.parse(savedState);
 
-        // Check if saved state is not too old (e.g., 24 hours)
-        const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        if (Date.now() - parsedState.timestamp < MAX_AGE) {
-          setSearchQuery(parsedState.searchQuery || "");
-          setPapers(parsedState.papers || []);
-          setAllPapers(parsedState.allPapers || []);
-          setFilters(
-            parsedState.filters || {
-              dateRange: "any",
-              paperType: "all",
-              citationRange: "any",
-              accessType: "all",
-            }
-          );
-          console.log("Home state restored from localStorage:", parsedState);
-        } else {
-          // Clear old state if it's too old
-          localStorage.removeItem("homePageState");
-          console.log("Old home state cleared");
-        }
+        // Load state without any time restrictions - persist until logout
+        setSearchQuery(parsedState.searchQuery || "");
+        setPapers(parsedState.papers || []);
+        setAllPapers(parsedState.allPapers || []);
+        setFilters(
+          parsedState.filters || {
+            dateRange: "any",
+            paperType: "all",
+            citationRange: "any",
+            accessType: "all",
+          }
+        );
+        console.log("Home state restored from localStorage:", parsedState);
       }
     } catch (error) {
       console.error("Error loading persisted state:", error);
@@ -128,7 +117,7 @@ export default function Home() {
     }
   };
 
-  // Clear persisted state (can be called when needed)
+  // Clear persisted state (manual clearing - normally cleared on logout)
   const clearPersistedState = () => {
     localStorage.removeItem("homePageState");
     console.log("Home state cleared from localStorage");
@@ -520,6 +509,8 @@ export default function Home() {
                         ? paper.pdfLink
                         : paper.sourceLink;
 
+
+
                     return (
                       <PaperCard
                         key={paper._id}
@@ -538,6 +529,9 @@ export default function Home() {
                         className="w-full"
                         handleCopyDOI={handleCopyDOI}
                         doi={paper.doi || ""}
+                        volume={paper.volume || ""}
+                        issue={paper.issue || ""}
+                        pages={paper.pages || ""}
                       />
                     );
                   })}

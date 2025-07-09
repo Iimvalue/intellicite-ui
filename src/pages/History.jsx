@@ -658,6 +658,9 @@ export default function History() {
                       onViewPaper={(link) => handleViewPaper(paper._id, link)}
                       onViewPdf={handleViewPdf}
                       className="w-full"
+                      volume={paper.volume || ""}
+                      issue={paper.issue || ""}
+                      pages={paper.pages || ""}
                     />
                   );
                 })}

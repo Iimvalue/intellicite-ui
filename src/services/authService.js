@@ -82,6 +82,7 @@ export const updateProfile = async (name, email, profileImage) => {
 
 export const logout = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("homePageState"); 
   window.dispatchEvent(new Event("authChange"));
 };
 

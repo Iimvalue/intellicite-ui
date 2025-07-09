@@ -194,14 +194,14 @@ export default function Save() {
   };
 
   // Function to get description - use personal notes or fallback
-  const getDescription = (reportText, paper, savedAt) => {
-    if (reportText && reportText.trim() !== "") {
-      return reportText; // Return personal notes if available
+  const getDescription = (paper) => {
+    if (paper.reportText && paper.reportText.trim() !== "") {
+      return paper.reportText; // Return personal notes if available
     }
 
     // Enhanced fallback with saved date
     const year = new Date(paper.publicationDate).getFullYear();
-    const savedDate = new Date(savedAt).toLocaleDateString();
+    const savedDate = new Date(paper.savedAt).toLocaleDateString();
     return `Published in ${paper.journal} (${year}) - Saved on ${savedDate}`;
   };
 
@@ -464,11 +464,7 @@ export default function Save() {
                 {papers.map((item) => {
                   const paper = item.paper;
                   const reportText = item.reportText || "";
-                  const description = getDescription(
-                    reportText,
-                    paper,
-                    item.savedAt
-                  );
+                  const description = getDescription(paper);
                   const viewLink =
                     paper.pdfLink && paper.pdfLink.trim() !== ""
                       ? paper.pdfLink
@@ -476,22 +472,24 @@ export default function Save() {
 
                   return (
                     <PaperCard
-                    key={item.id}
-                    badges={paper.badges || []}
-                    title={paper.title}
-                    description={description}
-                    authors={paper.authors}
-                    journal={paper.journal}
-                    publicationDate={paper.publicationDate}
-                    citationCount={paper.citationCount}
-                    viewPaperLink={viewLink}
-                    doi={paper.doi} 
-                    initialSaved={true}
-                    onSavePaper={() => handleUnsavePaper(paper._id)}
-                    onViewPaper={(link) => handleViewPaper(paper._id, link)}
-                    onViewPdf={handleViewPdf}
-                    className="w-full"
-                  />
+                      key={paper._id}
+                      badges={paper.badges || []}
+                      title={paper.title}
+                      description={description}
+                      authors={paper.authors}
+                      journal={paper.journal}
+                      publicationDate={paper.publicationDate}
+                      citationCount={paper.citationCount}
+                      viewPaperLink={viewLink}
+                      doi={paper.doi}
+                      className="w-full"
+                      onSavePaper={() => handleUnsavePaper(paper._id)}
+                      onViewPaper={(link) => handleViewPaper(paper._id, link)}
+                      onViewPdf={handleViewPdf}
+                      volume={paper.volume || ""}
+                      issue={paper.issue || ""}
+                      pages={paper.pages || ""}
+                    />
                   );
                 })}
               </div>

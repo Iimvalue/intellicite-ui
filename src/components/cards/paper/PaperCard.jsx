@@ -1,5 +1,4 @@
-import Cite from "citation-js";
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Bookmark,
@@ -7,10 +6,14 @@ import {
   FileText,
   Users,
   ExternalLink,
+  Check,
+  Loader2,
 } from "lucide-react";
 import { Toast } from "primereact/toast";
-import { useRef } from "react";
 import { FiClipboard } from "react-icons/fi";
+import { 
+  generateCitation
+} from "@/services/citationService";
 
 const PaperCard = ({
   badges = [],
@@ -26,11 +29,16 @@ const PaperCard = ({
   onViewPdf,
   initialSaved = false,
   doi,
+  volume,
+  issue,
+  pages,
   className = "",
 }) => {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [citationLoading, setCitationLoading] = useState({ APA: false, MLA: false });
+  const [citationSuccess, setCitationSuccess] = useState({ APA: false, MLA: false });
   const toast = useRef(null);
 
   // Determine badge color based on badge type
@@ -274,36 +282,7 @@ const PaperCard = ({
         };
     }
   };
-  // const handleCopyDOI = () => {
-  //   console.log("DOI:", doi);
-  //   // if (navigator.clipboard && doi) {
-  //   //   navigator.clipboard
-  //   //     .writeText(doi)
-  //   //     .then(() => {
-  //   //       toast.current.show({
-  //   //         severity: "success",
-  //   //         summary: "Copied",
-  //   //         detail: "DOI copied to clipboard",
-  //   //         life: 3000,
-  //   //       });
-  //   //     })
-  //   //     .catch(() => {
-  //   //       toast.current.show({
-  //   //         severity: "error",
-  //   //         summary: "Error",
-  //   //         detail: "Failed to copy DOI",
-  //   //         life: 3000,
-  //   //       });
-  //   //     });
-  //   // } else {
-  //   //   toast.current.show({
-  //   //     severity: "warn",
-  //   //     summary: "Not Available",
-  //   //     detail: "DOI not available",
-  //   //     life: 3000,
-  //   //   });
-  //   // }
-  // };
+
 
   const handleSavePaper = async () => {
     if (isLoading) return;
@@ -338,49 +317,8 @@ const PaperCard = ({
       onViewPaper(null);
     }
   };
-  const generateCitations = ({ title, authors = [], journal, doi, sourceLink, publicationDate }) => {
-    try {
-      const citationAuthors = authors.map((author) => {
-        const parts = author.trim().split(" ");
-        const lastName = parts.pop();
-        const firstName = parts.join(" ");
-        return {
-          family: lastName,
-          given: firstName,
-        };
-      });
-  
-      const pubDate = new Date(publicationDate);
-      const citationData = {
-        type: 'article-journal',
-        title,
-        author: citationAuthors,
-        'container-title': journal,
-        DOI: doi,
-        URL: sourceLink || '',
-        issued: { 'date-parts': [[pubDate.getFullYear(), pubDate.getMonth() + 1, pubDate.getDate()]] },
-        accessed: { 'date-parts': [[new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()]] },
-      };
-  
-      const citation = new Cite(citationData);
-  
-      return {
-        mla: citation.format('bibliography', {
-          format: 'text',
-          template: 'modern-language-association',
-          lang: 'en-US',
-        }).trim(),
-        apa: citation.format('bibliography', {
-          format: 'text',
-          template: 'apa',
-          lang: 'en-US',
-        }).trim(),
-      };
-    } catch (error) {
-      console.error('Citation generation error:', error);
-      return { mla: '', apa: '' };
-    }
-  };
+
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -424,6 +362,74 @@ const PaperCard = ({
       });
   };
 
+  const handleCopyCitation = useCallback((style) => {
+    if (!doi || citationLoading[style]) return;
+
+    setCitationLoading(prev => ({ ...prev, [style]: true }));
+    setCitationSuccess(prev => ({ ...prev, [style]: false }));
+
+    try {
+      const year = publicationDate ? new Date(publicationDate).getFullYear().toString() : '';
+      
+      const citationData = {
+        title: title || '',
+        authors: authors || [],
+        journal: journal || '',
+        year,
+        volume: volume || '',
+        issue: issue || '',
+        pages: pages || '',
+        doi: doi || ''
+      };
+
+      const citation = generateCitation(citationData, style);
+      
+      if (!citation || citation.trim() === '') {
+        toast.current.show({
+          severity: "warn",
+          summary: "Citation Unavailable",
+          detail: "Unable to generate citation. Missing required information.",
+          life: 4000,
+        });
+        setCitationLoading(prev => ({ ...prev, [style]: false }));
+        return;
+      }
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(citation).then(() => {
+          setCitationSuccess(prev => ({ ...prev, [style]: true }));
+          toast.current.show({
+            severity: "success",
+            summary: "Citation Copied",
+            detail: `${style} citation copied to clipboard`,
+            life: 3000,
+          });
+          
+          setTimeout(() => {
+            setCitationSuccess(prev => ({ ...prev, [style]: false }));
+          }, 2000);
+        }).catch(() => {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to copy citation to clipboard",
+            life: 3000,
+          });
+        });
+      }
+
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to generate citation",
+        life: 3000,
+      });
+    } finally {
+      setCitationLoading(prev => ({ ...prev, [style]: false }));
+    }
+  }, [doi, citationLoading, title, authors, journal, publicationDate, volume, issue, pages, toast]);
+
   const shouldShowViewMore = description && description.length > 200;
 
   return (
@@ -431,63 +437,68 @@ const PaperCard = ({
       <Toast ref={toast} />
 
       <div
-        className={`bg-white border border-gray-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 relative group ${className}`}
+        className={`bg-white border border-gray-200 rounded-xl hover:shadow-xl transition-all duration-300 group ${className}`}
       >
-        {/* Bookmark Icon - Top Right */}
-        <div className="absolute top-4 right-4 z-10">
-          <button
-            onClick={handleSavePaper}
-            disabled={isLoading}
-            className={`p-2.5 rounded-full transition-all duration-200 ${
-              isSaved
-                ? "text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 shadow-sm"
-                : "text-gray-800 hover:text-gray-600 hover:bg-gray-50 opacity-70 group-hover:opacity-100"
-            } ${
-              isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }`}
-            title={isSaved ? "Remove from saved" : "Save paper"}
-          >
-            <Bookmark className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`} />
-          </button>
-        </div>
-
-        {/* Header Section */}
-        <div className="mb-4 pr-16">
-          {/* Badges */}
-          {badges.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap mb-3">
-              {badges.map((badge, index) => {
-                const badgeStyle = getBadgeStyle(badge);
-                return (
-                  <span
-                    key={index}
-                    className="px-2.5 py-1 text-xs font-medium rounded-full border"
-                    style={{
-                      backgroundColor: badgeStyle.background,
-                      color: badgeStyle.text,
-                      borderColor: badgeStyle.border,
-                    }}
-                  >
-                    {badge}
-                  </span>
-                );
-              })}
+        {/* Card Header */}
+        <div className="p-6 pb-4">
+          <div className="flex items-start justify-between mb-4">
+            {/* Left side - Badges */}
+            <div className="flex-1">
+              {badges.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  {badges.map((badge, index) => {
+                    const badgeStyle = getBadgeStyle(badge);
+                    return (
+                      <span
+                        key={index}
+                        className="px-2.5 py-1 text-xs font-medium rounded-full border"
+                        style={{
+                          backgroundColor: badgeStyle.background,
+                          color: badgeStyle.text,
+                          borderColor: badgeStyle.border,
+                        }}
+                      >
+                        {badge}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Right side - Bookmark */}
+            <button
+              onClick={handleSavePaper}
+              disabled={isLoading}
+              className={`ml-4 p-2 rounded-full transition-all duration-200 ${
+                isSaved
+                  ? "text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 shadow-sm"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50 opacity-70 group-hover:opacity-100"
+              } ${
+                isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+              }`}
+              title={isSaved ? "Remove from saved" : "Save paper"}
+            >
+              <Bookmark className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`} />
+            </button>
+          </div>
 
           {/* Title */}
-          <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight line-clamp-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2">
             {title}
           </h3>
 
           {/* Authors */}
-          <div className="flex items-center text-gray-600 mb-2">
+          <div className="flex items-center text-gray-600 mb-3">
             <Users className="h-4 w-4 mr-2 flex-shrink-0" />
             <p className="text-sm font-medium line-clamp-1">
               {authors.length > 0 ? authors.join(", ") : "Unknown Authors"}
             </p>
           </div>
+        </div>
 
+        {/* Card Body */}
+        <div className="px-6 pb-4">
           {/* Publication Info */}
           <div className="flex items-center flex-wrap gap-4 text-gray-500 text-sm mb-4">
             {journal && (
@@ -506,91 +517,132 @@ const PaperCard = ({
 
             {citationCount > 0 && (
               <div className="flex items-center">
-                <div className="bg-gray-50 px-3 py-1.5 rounded-full">
-                  <span className="text-sm font-medium">
-                    {formatCitations(citationCount)} citations
-                  </span>
-                </div>
+                <span className="text-sm font-medium text-blue-800 px-2.5 py-1 rounded-full">
+                  {formatCitations(citationCount)} citations
+                </span>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Description */}
-        <div className="mb-5">
-          <p
-            className={`text-gray-700 text-sm leading-relaxed ${
-              !isExpanded && shouldShowViewMore ? "line-clamp-3" : ""
-            }`}
-          >
-            {description}
-          </p>
-          {shouldShowViewMore && (
-            <button
-              onClick={toggleExpanded}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 transition-colors duration-200"
+          {/* Description */}
+          <div className="mb-4">
+            <p
+              className={`text-gray-700 text-sm leading-relaxed ${
+                !isExpanded && shouldShowViewMore ? "line-clamp-3" : ""
+              }`}
             >
-              {isExpanded ? "View Less" : "View More"}
-            </button>
-          )}
-        </div>
-
-        {/* Footer Section */}
-        <div className="flex items-center justify-between">
-          {/* Citation Count */}
-          {/* Copy DOI Button */}
-          <div className="flex items-center text-gray-500 space-x-2">
-            {/* <span className="text-sm text-gray-700 truncate max-w-[70%] bg-gray-100 p-2 rounded-md">Doi</span> */}
-
-            <button
-              onClick={() => handleCopyDOI(doi)}
-              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              title={doi}
-            >
-              <FiClipboard size={18} />
-            </button>
-          </div>
-          {/* Action Button */}
-          
-          <Button
-            onClick={handleViewPaper}
-            className={`transition-all duration-200 font-medium ${
-              viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf")
-                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 hover:border-gray-400"
-            }`}
-            title={viewPaperLink || "No link available"}
-          >
-            {viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf") ? (
-              <>
-                <svg
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                View Paper
-              </>
-            ) : (
-              <>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Go to Source
-              </>
+              {description}
+            </p>
+            {shouldShowViewMore && (
+              <button
+                onClick={toggleExpanded}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 transition-colors duration-200"
+              >
+                {isExpanded ? "View Less" : "View More"}
+              </button>
             )}
-          </Button>
+          </div>
+        </div>
+
+        {/* Card Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+          <div className="flex items-center justify-between">
+            {/* Left side - Quick Actions */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={() => handleCopyDOI(doi)}
+                  className="p-2 rounded-lg hover:bg-gray-200 transition-colors text-gray-500"
+                  title={doi ? `Copy DOI: ${doi}` : "DOI not available"}
+                >
+                  <FiClipboard size={16} />
+                </button>
+                
+                <button
+                  onClick={() => handleCopyCitation('APA')}
+                  disabled={citationLoading.APA || !doi}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    citationSuccess.APA
+                      ? 'text-green-700 bg-green-100 hover:bg-green-200'
+                      : citationLoading.APA
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:bg-gray-200'
+                  }`}
+                  title={citationSuccess.APA ? 'APA citation copied to clipboard' : 'Copy APA citation'}
+                >
+                  {citationLoading.APA ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : citationSuccess.APA ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    "APA"
+                  )}
+                </button>
+                
+                <button
+                  onClick={() => handleCopyCitation('MLA')}
+                  disabled={citationLoading.MLA || !doi}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    citationSuccess.MLA
+                      ? 'text-green-700 bg-green-100 hover:bg-green-200'
+                      : citationLoading.MLA
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-600 hover:bg-gray-200'
+                  }`}
+                  title={citationSuccess.MLA ? 'MLA citation copied to clipboard' : 'Copy MLA citation'}
+                >
+                  {citationLoading.MLA ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : citationSuccess.MLA ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    "MLA"
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Right side - Primary Action */}
+            <Button
+              onClick={handleViewPaper}
+              className={`transition-all duration-200 font-medium ${
+                viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf")
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 hover:border-gray-400"
+              }`}
+              title={viewPaperLink || "No link available"}
+            >
+              {viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf") ? (
+                <>
+                  <svg
+                    className="h-4 w-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                  View Paper
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Go to Source
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </>
