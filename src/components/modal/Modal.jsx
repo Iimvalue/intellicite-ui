@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
 const PdfModal = ({ isOpen, onClose, pdfUrl, title = "View Paper" }) => {
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setHasError(false);
+      setIsLoading(true);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -24,6 +29,28 @@ const PdfModal = ({ isOpen, onClose, pdfUrl, title = "View Paper" }) => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
+
+  const handleIframeLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleIframeError = () => {
+    setHasError(true);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (isOpen && isLoading) {
+      const timeout = setTimeout(() => {
+        if (isLoading) {
+          setHasError(true);
+          setIsLoading(false);
+        }
+      }, 10000); // 10 second timeout
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isOpen, isLoading]);
 
   if (!isOpen) return null;
 
@@ -68,15 +95,57 @@ const PdfModal = ({ isOpen, onClose, pdfUrl, title = "View Paper" }) => {
         </div>
 
         {/* PDF Viewer Container */}
-        <div className="flex-1 min-h-0 overflow-hidden bg-gray-50">
+        <div className="flex-1 min-h-0 overflow-hidden bg-gray-50 relative">
           {pdfUrl ? (
-            <iframe
-              src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH&zoom=page-width`}
-              className="w-full h-full border-0 block"
-              title="PDF Viewer"
-              loading="lazy"
-              style={{ minHeight: '0' }}
-            />
+            <>
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading PDF...</p>
+                  </div>
+                </div>
+              )}
+              
+              {hasError ? (
+                <div className="flex items-center justify-center h-full bg-white">
+                  <div className="text-center max-w-md mx-auto p-6">
+                    <div className="text-gray-400 mb-4">
+                      <svg className="mx-auto h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">PDF Preview Unavailable</h3>
+                    <p className="text-gray-500 text-sm mb-4">
+                      This PDF cannot be displayed in the browser. It may be configured to download directly or have restricted access.
+                    </p>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => window.open(pdfUrl, '_blank')}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                      >
+                        Download PDF
+                      </button>
+                      <button
+                        onClick={onClose}
+                        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <iframe
+                  src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH&zoom=page-width`}
+                  className="w-full h-full border-0 block"
+                  title="PDF Viewer"
+                  onLoad={handleIframeLoad}
+                  onError={handleIframeError}
+                  style={{ minHeight: '0' }}
+                />
+              )}
+            </>
           ) : (
             <div className="flex items-center justify-center h-full bg-white">
               <div className="text-center">

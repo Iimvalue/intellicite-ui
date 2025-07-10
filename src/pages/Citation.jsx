@@ -216,6 +216,7 @@ function Citation() {
                 publicationDate={paper.publicationDate}
                 citationCount={paper.citationCount}
                 viewPaperLink={paper.pdfLink || paper.sourceLink}
+                pdfLink={paper.pdfLink}
                 initialSaved={false}
                 onSavePaper={() => {}}
                 onViewPaper={() => handleViewPaper(paper._id, paper.sourceLink)}

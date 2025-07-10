@@ -8,6 +8,7 @@ import {
   ExternalLink,
   StickyNote,
 } from "lucide-react";
+import PdfModal from "@/components/modal/Modal";
 
 const PaperCitation = ({
   badges = [],
@@ -18,6 +19,7 @@ const PaperCitation = ({
   publicationDate,
   citationCount,
   viewPaperLink,
+  pdfLink,
   onSavePaper,
   onViewPaper,
   onViewPdf,
@@ -26,6 +28,18 @@ const PaperCitation = ({
 }) => {
   const [isSaved, setIsSaved] = useState(initialSaved);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+
+  // Helper function to check if we have a PDF link
+  const hasPdfAvailable = () => {
+    const hasValidPdfLink = pdfLink && pdfLink.trim() !== "";
+    const isPdfViewLink = viewPaperLink && (
+      viewPaperLink.toLowerCase().includes(".pdf") || 
+      viewPaperLink.toLowerCase().includes("pdf") ||
+      viewPaperLink.toLowerCase().includes("filetype=pdf")
+    );
+    return hasValidPdfLink || isPdfViewLink;
+  };
 
   // Determine badge color based on badge type
   const getBadgeStyle = (badge) => {
@@ -298,10 +312,8 @@ const PaperCitation = ({
   };
   
   const handleViewPaper = () => {
-    const isPdfLink = viewPaperLink && viewPaperLink.toLowerCase().includes('.pdf');
-    
-    if (isPdfLink && onViewPdf) {
-      onViewPdf(viewPaperLink, title);
+    if (hasPdfAvailable()) {
+      setIsPdfModalOpen(true);
     } else if (viewPaperLink && onViewPaper) {
       onViewPaper(viewPaperLink);
     } else if (viewPaperLink) {
@@ -309,6 +321,10 @@ const PaperCitation = ({
     } else if (onViewPaper) {
       onViewPaper(null);
     }
+  };
+
+  const handleClosePdfModal = () => {
+    setIsPdfModalOpen(false);
   };
 
   return (
@@ -377,14 +393,13 @@ const PaperCitation = ({
               <Button
                 onClick={handleViewPaper}
                 className={`w-2/3 sm:w-auto transition-all duration-200 font-medium ${
-                  viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf")
+                  hasPdfAvailable()
                     ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
                     : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 hover:border-gray-400"
                 }`}
-                title={viewPaperLink || "No link available"}
+                title={pdfLink || viewPaperLink || "No link available"}
               >
-                {viewPaperLink &&
-                viewPaperLink.toLowerCase().includes(".pdf") ? (
+                {hasPdfAvailable() ? (
                   <>
                     <svg
                       className="h-4 w-4 mr-2"
@@ -439,6 +454,14 @@ const PaperCitation = ({
           </div>
         </div>
       </div>
+      
+      {/* PDF Modal */}
+      <PdfModal
+        isOpen={isPdfModalOpen}
+        onClose={handleClosePdfModal}
+        pdfUrl={pdfLink || viewPaperLink}
+        title={title}
+      />
     </div>
   );
 };

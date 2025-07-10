@@ -538,6 +538,7 @@ export default function Home() {
                         publicationDate={paper.publicationDate}
                         citationCount={paper.citationCount}
                         viewPaperLink={viewLink}
+                        pdfLink={paper.pdfLink}
                         initialSaved={savedPapers.has(paper._id)} // Check if paper is saved
                         onSavePaper={() => handleToggleSave(paper._id)}
                         onViewPaper={(link) => handleViewPaper(paper._id, link)}

@@ -470,27 +470,28 @@ export default function Save() {
                       ? paper.pdfLink
                       : paper.sourceLink;
 
-                  return (
-                    <PaperCard
-                      key={paper._id}
-                      badges={paper.badges || []}
-                      title={paper.title}
-                      description={description}
-                      authors={paper.authors}
-                      journal={paper.journal}
-                      publicationDate={paper.publicationDate}
-                      citationCount={paper.citationCount}
-                      viewPaperLink={viewLink}
-                      doi={paper.doi}
-                      className="w-full"
-                      onSavePaper={() => handleUnsavePaper(paper._id)}
-                      onViewPaper={(link) => handleViewPaper(paper._id, link)}
-                      onViewPdf={handleViewPdf}
-                      volume={paper.volume || ""}
-                      issue={paper.issue || ""}
-                      pages={paper.pages || ""}
-                    />
-                  );
+                                      return (
+                      <PaperCard
+                        key={paper._id}
+                        badges={paper.badges || []}
+                        title={paper.title}
+                        description={description}
+                        authors={paper.authors}
+                        journal={paper.journal}
+                        publicationDate={paper.publicationDate}
+                        citationCount={paper.citationCount}
+                        viewPaperLink={viewLink}
+                        pdfLink={paper.pdfLink}
+                        doi={paper.doi}
+                        className="w-full"
+                        onSavePaper={() => handleUnsavePaper(paper._id)}
+                        onViewPaper={(link) => handleViewPaper(paper._id, link)}
+                        onViewPdf={handleViewPdf}
+                        volume={paper.volume || ""}
+                        issue={paper.issue || ""}
+                        pages={paper.pages || ""}
+                      />
+                    );
                 })}
               </div>
 

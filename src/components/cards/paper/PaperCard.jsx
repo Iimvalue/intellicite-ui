@@ -14,6 +14,7 @@ import { FiClipboard } from "react-icons/fi";
 import { 
   generateCitation
 } from "@/services/citationService";
+import PdfModal from "@/components/modal/Modal";
 
 const PaperCard = ({
   badges = [],
@@ -24,6 +25,7 @@ const PaperCard = ({
   publicationDate,
   citationCount,
   viewPaperLink,
+  pdfLink,
   onSavePaper,
   onViewPaper,
   onViewPdf,
@@ -39,7 +41,19 @@ const PaperCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [citationLoading, setCitationLoading] = useState({ APA: false, MLA: false });
   const [citationSuccess, setCitationSuccess] = useState({ APA: false, MLA: false });
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const toast = useRef(null);
+
+  const hasPdfAvailable = useCallback(() => {
+    const hasValidPdfLink = pdfLink && pdfLink.trim() !== "";
+    const isPdfViewLink = viewPaperLink && (
+      viewPaperLink.toLowerCase().includes(".pdf") || 
+      viewPaperLink.toLowerCase().includes("pdf") ||
+      viewPaperLink.toLowerCase().includes("filetype=pdf")
+    );
+  
+    return hasValidPdfLink || isPdfViewLink;
+  }, [pdfLink, viewPaperLink, title]);
 
   // Determine badge color based on badge type
   const getBadgeStyle = (badge) => {
@@ -304,11 +318,8 @@ const PaperCard = ({
   };
 
   const handleViewPaper = () => {
-    const isPdfLink =
-      viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf");
-
-    if (isPdfLink && onViewPdf) {
-      onViewPdf(viewPaperLink, title);
+    if (hasPdfAvailable()) {
+      setIsPdfModalOpen(true);
     } else if (viewPaperLink && onViewPaper) {
       onViewPaper(viewPaperLink);
     } else if (viewPaperLink) {
@@ -316,6 +327,10 @@ const PaperCard = ({
     } else if (onViewPaper) {
       onViewPaper(null);
     }
+  };
+
+  const handleClosePdfModal = () => {
+    setIsPdfModalOpen(false);
   };
 
 
@@ -606,13 +621,13 @@ const PaperCard = ({
             <Button
               onClick={handleViewPaper}
               className={`transition-all duration-200 font-medium ${
-                viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf")
+                hasPdfAvailable()
                   ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 hover:border-gray-400"
               }`}
-              title={viewPaperLink || "No link available"}
+              title={pdfLink || viewPaperLink || "No link available"}
             >
-              {viewPaperLink && viewPaperLink.toLowerCase().includes(".pdf") ? (
+              {hasPdfAvailable() ? (
                 <>
                   <svg
                     className="h-4 w-4 mr-2"
@@ -645,6 +660,14 @@ const PaperCard = ({
           </div>
         </div>
       </div>
+      
+      {/* PDF Modal */}
+      <PdfModal
+        isOpen={isPdfModalOpen}
+        onClose={handleClosePdfModal}
+        pdfUrl={pdfLink || viewPaperLink}
+        title={title}
+      />
     </>
   );
 };
