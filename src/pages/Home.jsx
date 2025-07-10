@@ -268,8 +268,7 @@ export default function Home() {
 
       if (response.status === 200 && response.data.success) {
         console.log("Paper saved successfully:", response.data);
-        // You can show a success message to the user here
-        // For example, you could add a toast notification
+        setSavedPapers((prev) => new Set([...prev, paperId]));
         return { success: true, message: "Paper saved successfully!" };
       } else {
         console.error(
@@ -371,8 +370,8 @@ export default function Home() {
     try {
       const response = await axiosInstance.get("/api/bookmarks/");
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200 && response.data.success) {
+        const data = response.data;
         if (data.success && data.data) {
           // Extract paper IDs from saved papers
           const savedIds = new Set(

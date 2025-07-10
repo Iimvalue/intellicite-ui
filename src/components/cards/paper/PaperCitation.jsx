@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Bookmark,
+  BookmarkCheck,
   Calendar,
   FileText,
   Users,
@@ -30,7 +31,10 @@ const PaperCitation = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
-  // Helper function to check if we have a PDF link
+  useEffect(() => {
+    setIsSaved(initialSaved);
+  }, [initialSaved]);
+
   const hasPdfAvailable = () => {
     const hasValidPdfLink = pdfLink && pdfLink.trim() !== "";
     const isPdfViewLink = viewPaperLink && (
@@ -435,13 +439,15 @@ const PaperCitation = ({
                 disabled={isLoading}
                 className={`w-full sm:w-auto p-2 rounded-full transition ${
                   isSaved
-                    ? "text-green-600 bg-green-50"
-                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    ? "bg-green-50"
+                    : "hover:bg-gray-100"
                 }`}
               >
-                <Bookmark
-                  className={`w-5 h-5 mx-auto ${isSaved ? "fill-current" : ""}`}
-                />
+                {isSaved ? (
+                  <BookmarkCheck className="w-5 h-5 mx-auto text-green-600" />
+                ) : (
+                  <Bookmark className="w-5 h-5 mx-auto text-gray-400 hover:text-gray-600" />
+                )}
               </button>
             </div>
           </div>

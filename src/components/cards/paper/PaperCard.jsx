@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Bookmark,
+  BookmarkCheck,
   Calendar,
   FileText,
   Users,
@@ -43,6 +44,10 @@ const PaperCard = ({
   const [citationSuccess, setCitationSuccess] = useState({ APA: false, MLA: false });
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const toast = useRef(null);
+
+  useEffect(() => {
+    setIsSaved(initialSaved);
+  }, [initialSaved]);
 
   const hasPdfAvailable = useCallback(() => {
     const hasValidPdfLink = pdfLink && pdfLink.trim() !== "";
@@ -487,14 +492,18 @@ const PaperCard = ({
               disabled={isLoading}
               className={`ml-4 p-2 rounded-full transition-all duration-200 ${
                 isSaved
-                  ? "text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 shadow-sm"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50 opacity-70 group-hover:opacity-100"
+                  ? "bg-green-50 hover:bg-green-100 shadow-sm"
+                  : "hover:bg-gray-50 opacity-70 group-hover:opacity-100"
               } ${
                 isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
               }`}
               title={isSaved ? "Remove from saved" : "Save paper"}
             >
-              <Bookmark className={`h-5 w-5 ${isSaved ? "fill-current" : ""}`} />
+              {isSaved ? (
+                <BookmarkCheck className="h-5 w-5 text-green-600" />
+              ) : (
+                <Bookmark className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+              )}
             </button>
           </div>
 

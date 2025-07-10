@@ -484,6 +484,7 @@ export default function Save() {
                         pdfLink={paper.pdfLink}
                         doi={paper.doi}
                         className="w-full"
+                        initialSaved={true}
                         onSavePaper={() => handleUnsavePaper(paper._id)}
                         onViewPaper={(link) => handleViewPaper(paper._id, link)}
                         onViewPdf={handleViewPdf}
